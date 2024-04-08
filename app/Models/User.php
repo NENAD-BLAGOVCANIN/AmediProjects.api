@@ -58,7 +58,15 @@ class User extends Authenticatable implements JWTSubject
             $user->currently_selected_project_id = $project->id;
             $user->save();
             $user->projects()->attach($project);
+
+            $user->role()->associate(Role::where('name', Role::USER)->first());
+            $user->save();
         });
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 
 }
