@@ -35,10 +35,10 @@ Route::delete('/contacts/{id}', [ContactsController::class, 'destroy']);
 
 
 Route::get('/projects', [ProjectController::class, 'index']);
-Route::get('/my-projects', [ProjectController::class, 'myTeams']);
+Route::get('/my-projects', [ProjectController::class, 'myProjects']);
 Route::get('/project-info', [ProjectController::class, 'projectInfo']);
 Route::post('/projects', [ProjectController::class, 'store']);
-Route::post('/switch-project', [ProjectController::class, 'switchTeam']);
+Route::post('/switch-project', [ProjectController::class, 'switchProject']);
 Route::get('/projects/{id}', [ProjectController::class, 'show']);
 Route::put('/project', [ProjectController::class, 'update']);
 Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);

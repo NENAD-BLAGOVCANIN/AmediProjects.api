@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use App\Models\Role;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -59,7 +60,9 @@ class User extends Authenticatable implements JWTSubject
             $user->save();
             $user->projects()->attach($project);
 
-            $user->role()->associate(Role::where('name', Role::USER)->first());
+            $userRole = Role::where('name', 'user')->first();
+
+            $user->role_id = $userRole->id;
             $user->save();
         });
     }
