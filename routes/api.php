@@ -9,6 +9,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\LeadsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
 
 
 Route::group(['prefix' => 'auth'], function () {
@@ -45,6 +46,15 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/project', [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/project/members', [ProjectController::class, 'projectMembers']);
+
+
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
 
     Route::get('/tasks', [TasksController::class, 'index']);
