@@ -18,15 +18,14 @@ class ProductController extends Controller
             'name' => 'required',
             'description' => 'required',
             'price' => 'required|numeric',
-            'project_id' => 'nullable|exists:projects,id'
         ]);
 
-        return Product::create($request->all());
-    }
+        $user = auth()->user();
 
-    public function show(Product $product)
-    {
-        return $product;
+        $product = Product::create($request->all());
+        $product->project_id = $user->currently_selected_project_id;
+
+        return response()->json($product, 201);
     }
 
     public function update(Request $request, Product $product)
