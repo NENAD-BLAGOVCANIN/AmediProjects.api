@@ -57,10 +57,12 @@ class AuthController extends Controller
 
         NotificationHelper::createNotificationForUser($user, $notificationTitle, $notificationBody);
 
+        $newUser = User::with('role')->where('id', '=', $user->id)->first();
+
         return response()->json([
             'status' => 'success',
             'message' => 'User created successfully',
-            'user' => $user,
+            'user' => $newUser,
         ]);
     }
 
