@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Laravel\Passport\Passport;
+use App\Helpers\NotificationHelper;
 
 class AuthController extends Controller
 {
@@ -50,6 +51,11 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $notificationTitle = "Welcome to Amedi Projects!";
+        $notificationBody = "Welcome to our team " . $user->name . ". We are happy to have you on board.";
+
+        NotificationHelper::createNotificationForUser($user, $notificationTitle, $notificationBody);
 
         return response()->json([
             'status' => 'success',
