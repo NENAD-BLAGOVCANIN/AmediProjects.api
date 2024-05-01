@@ -10,6 +10,16 @@ class Project extends Model
 {
     use HasFactory;
 
+    const STATUS_SETTING_UP = 'setting up';
+    const STATUS_MEASUREMENT = 'measurement';
+    const STATUS_WRITING_A_PROGRAM = 'writing a program';
+    const STATUS_PRODUCTION = 'production';
+    const STATUS_GALVANIZATION = 'galvanization';
+    const STATUS_INSTALLATION = 'installation';
+    const STATUS_REJECTS = 'rejects';
+    const STATUS_DELIVERY = 'delivery';
+    const STATUS_COLLECTION = 'collection';
+
     protected $fillable = [
         'name',
         'description',
