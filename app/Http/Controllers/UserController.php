@@ -38,7 +38,7 @@ class UserController extends Controller
     
     public function info(Request $request){
 
-        $user = User::with('project')->find(auth()->id());
+        $user = User::with('project')->with('role')->with('notifications')->find(auth()->id());
 
         return response()->json($user, 200);
     }
