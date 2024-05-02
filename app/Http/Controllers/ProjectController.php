@@ -11,7 +11,7 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::all();
+        $projects = Project::with('users')->get();
         return response()->json($projects);
     }
 
@@ -19,7 +19,7 @@ class ProjectController extends Controller
     {
         $user = auth()->user();
 
-        $projects = Project::whereHas('users', function ($query) use ($user) {
+        $projects = Project::with('users')->whereHas('users', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->get();
 
