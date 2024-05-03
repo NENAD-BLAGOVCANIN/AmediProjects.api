@@ -71,14 +71,15 @@ class ProjectController extends Controller
 
     public function update(Request $request)
     {
+        $project_id = $request->get('id');
+        $project = Project::findOrFail($project_id);
+
         $validatedData = $request->validate([
             'name' => 'required|string',
             'description' => 'nullable|string',
+            'status' => 'nullable|string'
         ]);
 
-        $user = auth()->user();
-
-        $project = Project::findOrFail($user->currently_selected_project_id);
         $project->update($validatedData);
 
         return response()->json($project, 200);

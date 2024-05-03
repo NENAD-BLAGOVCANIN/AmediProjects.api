@@ -23,6 +23,7 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
+        'status'
     ];
 
     public function users()
