@@ -20,7 +20,8 @@ class Task extends Model
         'lead_id',
         'project_id',
         'assigned_to',
-        'status'
+        'status',
+        'due_date',
     ];
 
     public function assignee()

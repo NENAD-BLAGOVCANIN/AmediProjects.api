@@ -10,6 +10,7 @@ use App\Http\Controllers\TasksController;
 use App\Http\Controllers\LeadsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\NotificationsController;
 
 
 Route::group(['prefix' => 'auth'], function () {
@@ -46,8 +47,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/project', [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/project/members', [ProjectController::class, 'projectMembers']);
-
-
+    
+    
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/products/{product}', [ProductController::class, 'show']);
@@ -61,6 +62,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/tasks/{id}', [TasksController::class, 'show']);
     Route::put('/tasks/{id}', [TasksController::class, 'update']);
     Route::delete('/tasks/{id}', [TasksController::class, 'destroy']);
+
+
+    Route::get('/notifications', [NotificationsController::class, 'index']);
 
 
     Route::get('/leads', [LeadsController::class, 'index']);

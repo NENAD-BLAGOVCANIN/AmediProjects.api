@@ -20,6 +20,7 @@ class TasksController extends Controller
             'description' => 'nullable|string',
             'lead_id' => 'nullable|exists:leads,id',
             'assigned_to' => 'nullable|exists:users,id',
+            'due_date' => 'nullable|date',
         ]);
 
         $task = Task::create($validatedData);
@@ -60,7 +61,8 @@ class TasksController extends Controller
             'lead_id' => 'nullable|exists:leads,id',
             'project_id' => 'required|exists:projects,id',
             'assigned_to' => 'nullable|exists:users,id',
-            'status' => 'required|string'
+            'due_date' => 'nullable|date',
+            'status' => 'required|string',
         ]);
 
         $task = Task::findOrFail($id);
