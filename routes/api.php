@@ -65,6 +65,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
     Route::get('/notifications', [NotificationsController::class, 'index']);
+    Route::get('/notifications/{id}', [NotificationsController::class, 'show']);
 
 
     Route::get('/leads', [LeadsController::class, 'index']);
