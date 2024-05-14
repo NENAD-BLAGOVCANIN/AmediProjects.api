@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileImageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,13 +32,16 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/user/info', [UserController::class, 'info']);
 
 
+    Route::post('/profile/image', [ProfileImageController::class, 'updateProfileImage']);
+
+
     Route::get('/contacts', [ContactsController::class, 'index']);
     Route::post('/contacts', [ContactsController::class, 'store']);
     Route::get('/contacts/{id}', [ContactsController::class, 'show']);
     Route::put('/contacts/{id}', [ContactsController::class, 'update']);
     Route::delete('/contacts/{id}', [ContactsController::class, 'destroy']);
-
-
+    
+    
     Route::get('/projects', [ProjectController::class, 'index']);
     Route::get('/my-projects', [ProjectController::class, 'myProjects']);
     Route::get('/project-info', [ProjectController::class, 'projectInfo']);
@@ -47,7 +51,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/project', [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/project/members', [ProjectController::class, 'projectMembers']);
-    
+
+    Route::post('/projects/image', [ProfileImageController::class, 'updateProjectImage']);
     
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
@@ -74,8 +79,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/leads/{id}', [LeadsController::class, 'update']);
     Route::delete('/leads/{id}', [LeadsController::class, 'destroy']);
 
-    Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
 
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
 });
 
 Route::post('/handle-invite-link', [ProjectController::class, 'inviteLink']);
