@@ -24,7 +24,7 @@ class ProfileImageController extends Controller
                 Storage::disk('public')->delete($user->profile_image);
             }
 
-            $imageUrl = $user->profile_image ? asset('storage/' . $imagePath) : null;
+            $imageUrl = asset('storage/' . $imagePath);
             $user->profile_image = $imageUrl;
             $user->save();
         }
@@ -36,22 +36,22 @@ class ProfileImageController extends Controller
     public function updateProjectImage(Request $request)
     {
         $request->validate([
-            'profile_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'project_id' => 'required|exists:projects,id'
         ]);
 
-        $project_id = $request->get('id');
+        $project_id = $request->get('project_id');
         $project = Project::findOrFail($project_id);
 
-        if ($request->hasFile('profile_image')) {
-            $imagePath = $request->file('profile_image')->store('profile_images', 'public');
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images', 'public');
 
             if ($project->image) {
                 Storage::disk('public')->delete($project->image);
             }
 
-            $imageUrl = $project->image ? asset('storage/' . $imagePath) : null;
-            $project->profile_image = $imageUrl;
+            $imageUrl = asset('storage/' . $imagePath);
+            $project->image = $imageUrl;
             $project->save();
         }
 
