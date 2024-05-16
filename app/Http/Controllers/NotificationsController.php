@@ -18,8 +18,8 @@ class NotificationsController extends Controller
 
     public function show($id)
     {
-
-        $notification = auth()->user()->notifications()->find($id)->firstOrFail();
+        $userId = auth()->user()->id;
+        $notification = User::find($userId)->notifications()->find($id)->firstOrFail();
         return response()->json($notification);
     }
 
