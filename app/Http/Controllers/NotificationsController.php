@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class NotificationsController extends Controller
 {
     public function index()
     {
-        $notifications = auth()->user()->notifications()->paginate(20);
+        $userId = auth()->user()->id;
+        $notifications = User::find($userId)->notifications()->paginate(20);
 
         return response()->json($notifications);
     }
