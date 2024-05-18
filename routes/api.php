@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\ProfileImageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -78,6 +79,12 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/leads/{id}', [LeadsController::class, 'show']);
     Route::put('/leads/{id}', [LeadsController::class, 'update']);
     Route::delete('/leads/{id}', [LeadsController::class, 'destroy']);
+
+    Route::get('/clients', [ClientsController::class, 'index']);
+    Route::post('/clients', [ClientsController::class, 'store']);
+    Route::get('/clients/{id}', [ClientsController::class, 'show']);
+    Route::put('/clients/{id}', [ClientsController::class, 'update']);
+    Route::delete('/clients/{id}', [ClientsController::class, 'destroy']);
 
 
     Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);

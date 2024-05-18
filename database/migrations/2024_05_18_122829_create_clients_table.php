@@ -6,24 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
-        Schema::create('leads', function (Blueprint $table) {
+        Schema::create('clients', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('contact_id');
             $table->foreign('contact_id')->references('id')->on('contacts')->onDelete('cascade');
-            $table->text('description')->nullable();
-            $table->string('lead_source')->nullable();
             $table->timestamps();
-            $table->boolean('is_deleted')->default(false);
         });
     }
 
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('leads');
+        Schema::dropIfExists('clients');
     }
 };
