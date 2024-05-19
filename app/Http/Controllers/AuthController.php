@@ -88,7 +88,7 @@ class AuthController extends Controller
     }
     public function setTokenExpirationTimes()
     {
-        Passport::tokensExpireIn(now()->addDays(7));
+        Passport::tokensExpireIn(now()->addDays(30));
         Passport::refreshTokensExpireIn(now()->addMonths(6));
     }
 

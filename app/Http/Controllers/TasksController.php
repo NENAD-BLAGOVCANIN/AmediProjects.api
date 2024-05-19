@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Helpers\NotificationHelper;
+use App\Models\User;
 
 class TasksController extends Controller
 {
@@ -34,6 +36,7 @@ class TasksController extends Controller
     public function assign(Request $request){
 
         $user_id = $request->get('user_id');
+        $user = User::findOrFail($user_id);
 
         $task_id = $request->get('task_id');
 
@@ -42,6 +45,11 @@ class TasksController extends Controller
         $task->save();
 
         $updatedTask = Task::with('assignee')->findOrFail($task_id);
+
+        $notificationTitle = "You have a new task.";
+        $notificationBody = "Hello! Someone just assigned a new task to you. Go to the tasks page to check it out.";
+
+        NotificationHelper::createNotificationForUser($user, $notificationTitle, $notificationBody);
 
 
         return response()->json($updatedTask, 201);
