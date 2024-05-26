@@ -13,8 +13,8 @@ class CreateProductsTable extends Migration
             $table->unsignedBigInteger('project_id')->nullable();
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('set null');
             $table->string('name');
-            $table->text('description');
-            $table->decimal('price', 8, 2);
+            $table->text('description')->nullable();
+            $table->decimal('price', 8, 2)->nullable();
             $table->timestamps();
         });
     }

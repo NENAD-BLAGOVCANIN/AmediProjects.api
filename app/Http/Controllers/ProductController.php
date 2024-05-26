@@ -16,8 +16,8 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'description' => 'required',
-            'price' => 'required|numeric',
+            'description' => 'nullable',
+            'price' => 'nullable|numeric',
         ]);
 
         $user = auth()->user();
