@@ -22,8 +22,9 @@ class ProductController extends Controller
 
         $user = auth()->user();
 
-        $product = Product::create($request->all());
+        $product = new Product($request->all());
         $product->project_id = $user->currently_selected_project_id;
+        $product->save();
 
         return response()->json($product, 201);
     }

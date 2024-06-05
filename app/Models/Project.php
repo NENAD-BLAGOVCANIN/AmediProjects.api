@@ -21,10 +21,8 @@ class Project extends Model
     const STATUS_COLLECTION = 'collection';
 
     protected $fillable = [
-        'name',
-        'description',
-        'status',
-        'image',
+        'name', 'description', 'company_name', 'location', 'contact_person', 'phone', 'file_url',
+
     ];
 
     public function users()
