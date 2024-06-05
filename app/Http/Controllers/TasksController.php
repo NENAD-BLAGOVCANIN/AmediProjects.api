@@ -21,6 +21,8 @@ class TasksController extends Controller
             'subject' => 'required|string',
             'description' => 'nullable|string',
             'lead_id' => 'nullable|exists:leads,id',
+            'phone' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
             'assigned_to' => 'nullable|exists:users,id',
             'due_date' => 'nullable|date',
         ]);
@@ -69,6 +71,8 @@ class TasksController extends Controller
             'lead_id' => 'nullable|exists:leads,id',
             'project_id' => 'required|exists:projects,id',
             'assigned_to' => 'nullable|exists:users,id',
+            'phone' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
             'due_date' => 'nullable|date',
             'status' => 'required|string',
         ]);
