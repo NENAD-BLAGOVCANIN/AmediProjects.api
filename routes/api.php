@@ -13,6 +13,7 @@ use App\Http\Controllers\LeadsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\CollectionController;
 
 
 Route::group(['prefix' => 'auth'], function () {
@@ -35,6 +36,12 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::post('/profile/image', [ProfileImageController::class, 'updateProfileImage']);
 
+    // collections
+    Route::get('collections', [CollectionController::class, 'index']);
+    Route::post('collections', [CollectionController::class, 'store']);
+    Route::get('collections/{collection}', [CollectionController::class, 'show']);
+    Route::put('collections/{collection}', [CollectionController::class, 'update']);
+    Route::delete('collections/{collection}', [CollectionController::class, 'destroy']);
 
     Route::get('/contacts', [ContactsController::class, 'index']);
     Route::post('/contacts', [ContactsController::class, 'store']);
