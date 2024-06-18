@@ -39,6 +39,13 @@ class ProjectController extends Controller
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'user_ids' => 'nullable|array',
             'user_ids.*' => 'exists:users,id',
+            'company_number' => 'nullable|string',
+            'accounting_phone' => 'nullable|string',
+            'project_manager_phone' => 'nullable|string',
+            'accounting_email' => 'nullable|string',
+            'project_manager_email' => 'nullable|string',
+            'project_manager_name' => 'nullable|string',
+            'accounting_manager_name' => 'nullable|string',
         ]);
 
         if ($request->hasFile('file')) {
@@ -49,7 +56,6 @@ class ProjectController extends Controller
         $user = auth()->user();
 
         $project = Project::create($validatedData);
-       
 
         // Attach the authenticated user to the project
         $user = auth()->user();
@@ -105,6 +111,13 @@ class ProjectController extends Controller
             'contact_person' => 'nullable|string',
             'phone' => 'nullable|string',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'company_number' => 'nullable|string',
+            'accounting_phone' => 'nullable|string',
+            'project_manager_phone' => 'nullable|string',
+            'accounting_email' => 'nullable|string',
+            'project_manager_email' => 'nullable|string',
+            'project_manager_name' => 'nullable|string',
+            'accounting_manager_name' => 'nullable|string',
         ]);
 
         if ($request->hasFile('file')) {

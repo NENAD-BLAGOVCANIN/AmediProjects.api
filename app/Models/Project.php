@@ -22,7 +22,7 @@ class Project extends Model
 
     protected $fillable = [
         'name', 'description', 'company_name', 'location', 'contact_person', 'phone', 'file_url',
-
+        'company_number', 'accounting_phone', 'project_manager_phone', 'accounting_email', 'project_manager_email', 'project_manager_name', 'accounting_manager_name'
     ];
 
     public function users()
@@ -41,5 +41,4 @@ class Project extends Model
     {
         return $this->hasMany(Product::class);
     }
-    
 }
