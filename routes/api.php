@@ -14,6 +14,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\ProductionController;
 
 
 Route::group(['prefix' => 'auth'], function () {
@@ -42,6 +43,14 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('collections/{collection}', [CollectionController::class, 'show']);
     Route::put('collections/{collection}', [CollectionController::class, 'update']);
     Route::delete('collections/{collection}', [CollectionController::class, 'destroy']);
+
+    // productions
+    Route::get('productions', [ProductionController::class, 'index']);
+    Route::post('productions', [ProductionController::class, 'store']);
+    Route::get('productions/{production}', [ProductionController::class, 'show']);
+    Route::put('productions/{production}', [ProductionController::class, 'update']);
+    Route::delete('productions/{production}', [ProductionController::class, 'destroy']);
+
 
     Route::get('/contacts', [ContactsController::class, 'index']);
     Route::post('/contacts', [ContactsController::class, 'store']);
