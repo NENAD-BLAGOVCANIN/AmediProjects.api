@@ -25,8 +25,8 @@ class CollectionController extends Controller
             'project_manager_mobile' => 'nullable|string',
             'accounting_manager_mobile' => 'nullable|string',
             'email' => 'nullable|email',
-            'last_execution_date' => 'nullable|date',
-            'agreed_payment_date' => 'nullable|date',
+            'last_execution_date' => 'nullable|string',
+            'agreed_payment_date' => 'nullable|string',
             'contact_person' => 'nullable|string',
             'debt' => 'nullable|string',
             'first_line_sent_whatsapp' => 'nullable|string',
@@ -37,6 +37,15 @@ class CollectionController extends Controller
             'call_2_created' => 'nullable|string',
             'collected_amount' => 'nullable|string',
             'remaining_amount_to_collect' => 'nullable|string',
+            'company_name' => 'nullable|string',
+            'cumulative_offset' => 'nullable|string',
+            'offset_instead_of_guarantee' => 'nullable|string',
+            'payment_status' => 'nullable|string',
+            'last_connection' => 'nullable|string',
+            'last_invoice_issuance_date'=> 'nullable|string', 
+            'collection_contact'=> 'nullable|string', 
+            'amount_collected_this_month' => 'nullable|string',
+            'is_archived' => 'nullable|int',
         ]);
 
         return Collection::create($request->all());
@@ -60,8 +69,8 @@ class CollectionController extends Controller
             'project_manager_mobile' => 'nullable|string',
             'accounting_manager_mobile' => 'nullable|string',
             'email' => 'nullable|email',
-            'last_execution_date' => 'nullable|date',
-            'agreed_payment_date' => 'nullable|date',
+            'last_execution_date' => 'nullable|string',
+            'agreed_payment_date' => 'nullable|string',
             'contact_person' => 'nullable|string',
             'debt' => 'nullable|string',
             'first_line_sent_whatsapp' => 'nullable|string',
@@ -72,6 +81,15 @@ class CollectionController extends Controller
             'call_2_created' => 'nullable|string',
             'collected_amount' => 'nullable|string',
             'remaining_amount_to_collect' => 'nullable|string',
+            'company_name' => 'nullable|string',
+            'cumulative_offset' => 'nullable|string',
+            'offset_instead_of_guarantee' => 'nullable|string',
+            'payment_status' => 'nullable|string',
+            'last_connection' => 'nullable|string',
+            'last_invoice_issuance_date'=> 'nullable|string', 
+            'collection_contact'=> 'nullable|string', 
+            'amount_collected_this_month' => 'nullable|string',
+            'is_archived' => 'nullable|int',
         ]);
 
         $collection->update($request->all());
