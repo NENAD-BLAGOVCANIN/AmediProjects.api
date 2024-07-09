@@ -84,6 +84,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/tasks/{id}', [TasksController::class, 'show']);
     Route::put('/tasks/{id}', [TasksController::class, 'update']);
     Route::delete('/tasks/{id}', [TasksController::class, 'destroy']);
+    Route::get('taskable-items', [TasksController::class, 'getTaskableItems']);
 
 
     Route::get('/notifications', [NotificationsController::class, 'index']);

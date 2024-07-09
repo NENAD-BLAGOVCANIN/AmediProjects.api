@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Task;
 
 class Contact extends Model
 {
@@ -21,5 +22,8 @@ class Contact extends Model
         'phone',
         'organization',
     ];
-
+    public function tasks()
+    {
+        return $this->morphMany(Task::class, 'taskable');
+    }
 }

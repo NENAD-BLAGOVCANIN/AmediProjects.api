@@ -18,44 +18,80 @@ class TasksController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'subject' => 'required|string',
+            'subject' => 'nullable|string',
             'description' => 'nullable|string',
-            'lead_id' => 'nullable|exists:leads,id',
-            'phone' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'assigned_to' => 'nullable|exists:users,id',
             'due_date' => 'nullable|date',
+            'assigned_to' => 'nullable|exists:users,id',
+            'taskable_id' => 'nullable|integer',
+            'taskable_type' => 'nullable|string|in:App\Models\Contact,App\Models\Collection,App\Models\Lead',
         ]);
-
-        $task = Task::create($validatedData);
+      // Set default description if not provided
+      if (empty($validatedData['description'])) {
+        $validatedData['description'] = 'אין תיאור';
+    }
+        $task = new Task($validatedData);
         $task->project_id = auth()->user()->currently_selected_project_id;
         $task->status = Task::STATUS_TODO;
-        $task->save();
-
+    
+        if ($request->filled('taskable_id') && $request->filled('taskable_type')) {
+            $taskable = $request->input('taskable_type')::find($request->input('taskable_id'));
+            if ($taskable) {
+                $taskable->tasks()->save($task);
+            } else {
+                return response()->json(['error' => 'Invalid taskable ID or type'], 400);
+            }
+        } else {
+            $task->save();
+        }
+    
         return response()->json($task, 201);
     }
+    public function getTaskableItems(Request $request)
+{
+    $request->validate([
+        'taskable_type' => 'required|string|in:App\\Models\\Contact,App\\Models\\Collection,App\\Models\\Lead',
+    ]);
 
-    public function assign(Request $request){
+    $taskableType = $request->input('taskable_type');
+    $items = $taskableType::select('id', 'name')->get(); // Adjust the select fields as necessary
 
-        $user_id = $request->get('user_id');
-        $user = User::findOrFail($user_id);
+    return response()->json($items);
+}
 
-        $task_id = $request->get('task_id');
 
-        $task = Task::findOrFail($task_id);
-        $task->assigned_to = $user_id;
+    public function assign(Request $request)
+    {
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'task_id' => 'required|exists:tasks,id',
+            'taskable_id' => 'nullable|integer',
+            'taskable_type' => 'nullable|string|in:App\Models\Contact,App\Models\Collection,App\Models\Lead',
+        ]);
+    
+        $task = Task::findOrFail($validatedData['task_id']);
+        $task->assigned_to = $validatedData['user_id'];
+    
+        if ($request->filled('taskable_id') && $request->filled('taskable_type')) {
+            $taskable = $validatedData['taskable_type']::find($validatedData['taskable_id']);
+            if ($taskable) {
+                $task->taskable_id = $validatedData['taskable_id'];
+                $task->taskable_type = $validatedData['taskable_type'];
+            } else {
+                return response()->json(['error' => 'Invalid taskable ID or type'], 400);
+            }
+        }
+    
         $task->save();
-
-        $updatedTask = Task::with('assignee')->findOrFail($task_id);
-
+    
+        $user = User::findOrFail($validatedData['user_id']);
         $notificationTitle = "You have a new task.";
         $notificationBody = "Hello! Someone just assigned a new task to you. Go to the tasks page to check it out.";
-
+    
         NotificationHelper::createNotificationForUser($user, $notificationTitle, $notificationBody);
-
-
-        return response()->json($updatedTask, 201);
+    
+        return response()->json($task->load('assignee'), 201);
     }
+    
 
     public function show($id)
     {
@@ -66,7 +102,7 @@ class TasksController extends Controller
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'subject' => 'required|string',
+            'subject' => 'nullable|string',
             'description' => 'nullable|string',
             'lead_id' => 'nullable|exists:leads,id',
             'project_id' => 'required|exists:projects,id',
@@ -76,7 +112,10 @@ class TasksController extends Controller
             'due_date' => 'nullable|date',
             'status' => 'required|string',
         ]);
-
+        // Set default description if not provided
+        if (empty($validatedData['description'])) {
+            $validatedData['description'] = 'אין תיאור';
+        }
         $task = Task::findOrFail($id);
         $task->update($validatedData);
 

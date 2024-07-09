@@ -24,6 +24,8 @@ class Task extends Model
         'phone',
         'email',
         'due_date',
+        'taskable_id',  // Add these fields to the fillable array
+        'taskable_type',  // Add these fields to the fillable array
     ];
 
     public function assignee()
@@ -31,4 +33,8 @@ class Task extends Model
         return $this->hasOne('App\Models\User', 'id', 'assigned_to');
     }
 
+    public function taskable()
+    {
+        return $this->morphTo();
+    }
 }

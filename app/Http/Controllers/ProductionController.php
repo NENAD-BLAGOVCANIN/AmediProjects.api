@@ -19,10 +19,15 @@ class ProductionController extends Controller
             'company' => 'required|string',
             'site_city' => 'nullable|string',
             'item' => 'nullable|string',
-            'status' => 'nullable|string',
+            'status' => 'nullable|string|in:planning,measuring,finished',
             'performed_by' => 'nullable|string',
             'notes' => 'nullable|string',
         ]);
+
+        // Set default status if not provided
+        if (!isset($validatedData['status'])) {
+            $validatedData['status'] = 'measuring';
+        }
 
         $production = Production::create($validatedData);
 
@@ -43,10 +48,15 @@ class ProductionController extends Controller
             'company' => 'required|string',
             'site_city' => 'nullable|string',
             'item' => 'nullable|string',
-            'status' => 'nullable|string',
+            'status' => 'nullable|string|in:planning,measuring,finished',
             'performed_by' => 'nullable|string',
             'notes' => 'nullable|string',
         ]);
+
+        // Set default status if not provided
+        if (!isset($validatedData['status'])) {
+            $validatedData['status'] = 'measuring';
+        }
 
         $production->update($validatedData);
 
