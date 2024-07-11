@@ -36,6 +36,7 @@ class CollectionController extends Controller
             'details_2' => 'nullable|string',
             'call_2_created' => 'nullable|string',
             'collected_amount' => 'nullable|string',
+            'paymnet_plus' => 'nullable|string',
             'remaining_amount_to_collect' => 'nullable|string',
             'company_name' => 'nullable|string',
             'cumulative_offset' => 'nullable|string',
@@ -46,6 +47,10 @@ class CollectionController extends Controller
             'collection_contact'=> 'nullable|string', 
             'amount_collected_this_month' => 'nullable|string',
             'is_archived' => 'nullable|int',
+            'last_invoice_issue_date'=> 'nullable|string',
+            'last_detail_sent_date'=> 'nullable|string',
+            'offset_instead_of_guarantee_before_vat'=> 'nullable|string',
+            'guarantee_end_date'=> 'nullable|string',
         ]);
 
         return Collection::create($request->all());
@@ -72,6 +77,7 @@ class CollectionController extends Controller
             'last_execution_date' => 'nullable|string',
             'agreed_payment_date' => 'nullable|string',
             'contact_person' => 'nullable|string',
+            'paymnet_plus' => 'nullable|string',
             'debt' => 'nullable|string',
             'first_line_sent_whatsapp' => 'nullable|string',
             'details' => 'nullable|string',
@@ -90,6 +96,10 @@ class CollectionController extends Controller
             'collection_contact'=> 'nullable|string', 
             'amount_collected_this_month' => 'nullable|string',
             'is_archived' => 'nullable|int',
+            'last_invoice_issue_date'=> 'nullable|string',
+            'last_detail_sent_date'=> 'nullable|string',
+            'offset_instead_of_guarantee_before_vat'=> 'nullable|string',
+            'guarantee_end_date'=> 'nullable|string',
         ]);
 
         $collection->update($request->all());
