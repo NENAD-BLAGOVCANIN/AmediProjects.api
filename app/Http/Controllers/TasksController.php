@@ -11,8 +11,11 @@ class TasksController extends Controller
 {
     public function index()
     {
-        $tasks = Task::with('assignee')->where('project_id', '=', auth()->user()->currently_selected_project_id)->orderBy('id', 'desc')->get();
-        return response()->json($tasks);
+        $tasks = Task::with('assignee')
+        ->where('assigned_to', auth()->id())
+        ->orderBy('id', 'desc')
+        ->get();
+    return response()->json($tasks);
     }
 
     public function store(Request $request)
@@ -28,7 +31,12 @@ class TasksController extends Controller
       // Set default description if not provided
       if (empty($validatedData['description'])) {
         $validatedData['description'] = 'אין תיאור';
-    }
+
+        }
+        // Ensure assigned_to is not null
+        if (empty($validatedData['assigned_to'])) {
+            $validatedData['assigned_to'] = auth()->id();
+        }
         $task = new Task($validatedData);
         $task->project_id = auth()->user()->currently_selected_project_id;
         $task->status = Task::STATUS_TODO;
@@ -59,38 +67,40 @@ class TasksController extends Controller
 }
 
 
-    public function assign(Request $request)
-    {
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'task_id' => 'required|exists:tasks,id',
-            'taskable_id' => 'nullable|integer',
-            'taskable_type' => 'nullable|string|in:App\Models\Contact,App\Models\Collection,App\Models\Lead',
-        ]);
-    
-        $task = Task::findOrFail($validatedData['task_id']);
-        $task->assigned_to = $validatedData['user_id'];
-    
-        if ($request->filled('taskable_id') && $request->filled('taskable_type')) {
-            $taskable = $validatedData['taskable_type']::find($validatedData['taskable_id']);
-            if ($taskable) {
-                $task->taskable_id = $validatedData['taskable_id'];
-                $task->taskable_type = $validatedData['taskable_type'];
-            } else {
-                return response()->json(['error' => 'Invalid taskable ID or type'], 400);
-            }
+public function assign(Request $request)
+{
+    $validatedData = $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'task_id' => 'required|exists:tasks,id',
+        'taskable_id' => 'nullable|integer',
+        'taskable_type' => 'nullable|string|in:App\Models\Contact,App\Models\Collection,App\Models\Lead',
+    ]);
+
+    $task = Task::findOrFail($validatedData['task_id']);
+    $task->assigned_to = $validatedData['user_id'];
+    $task->project_id = $validatedData['project_id'] ?? $task->project_id;
+
+    if ($request->filled('taskable_id') && $request->filled('taskable_type')) {
+        $taskable = $validatedData['taskable_type']::find($validatedData['taskable_id']);
+        if ($taskable) {
+            $task->taskable_id = $validatedData['taskable_id'];
+            $task->taskable_type = $validatedData['taskable_type'];
+        } else {
+            return response()->json(['error' => 'Invalid taskable ID or type'], 400);
         }
-    
-        $task->save();
-    
-        $user = User::findOrFail($validatedData['user_id']);
-        $notificationTitle = "You have a new task.";
-        $notificationBody = "Hello! Someone just assigned a new task to you. Go to the tasks page to check it out.";
-    
-        NotificationHelper::createNotificationForUser($user, $notificationTitle, $notificationBody);
-    
-        return response()->json($task->load('assignee'), 201);
     }
+
+    $task->save();
+
+    $user = User::findOrFail($validatedData['user_id']);
+    $notificationTitle = "You have a new task.";
+    $notificationBody = "Hello! Someone just assigned a new task to you. Go to the tasks page to check it out.";
+
+    NotificationHelper::createNotificationForUser($user, $notificationTitle, $notificationBody);
+
+    return response()->json($task->load('assignee'), 201);
+}
+
     
 
     public function show($id)

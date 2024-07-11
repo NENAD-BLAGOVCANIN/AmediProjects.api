@@ -17,6 +17,7 @@ class Contact extends Model
         'city',
         'address',
         'description',
+        'status',
         'lead_source',
         'past_client',
         'phone',
