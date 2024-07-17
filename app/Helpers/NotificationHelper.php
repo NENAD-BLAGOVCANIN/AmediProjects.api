@@ -12,9 +12,10 @@ class NotificationHelper
         $notification = new Notification([
             'title' => $title,
             'body' => $body,
+            'user_id' => $user->id,
         ]);
 
-        $user->notifications()->save($notification);
+        $notification->save();
 
         return $notification;
     }

@@ -15,5 +15,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('tasks:check-overdue')->dailyAt('09:00');
+        $schedule->command('tasks:generate-recurring')->daily();
+        $schedule->command('tasks:send-reminders')->everyFiveMinutes();
     }
 }

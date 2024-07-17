@@ -29,7 +29,12 @@ class Project extends Model
     {
         return $this->belongsToMany(User::class, 'project_users');
     }
-
+    public function stations()
+    {
+        return $this->belongsToMany(Station::class, 'project_station')
+                    ->withPivot('entry_time', 'due_date')
+                    ->withTimestamps();
+    }
     protected static function booted()
     {
         static::creating(function ($project) {

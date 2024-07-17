@@ -24,8 +24,12 @@ class Task extends Model
         'phone',
         'email',
         'due_date',
-        'taskable_id',  // Add these fields to the fillable array
-        'taskable_type',  // Add these fields to the fillable array
+        'taskable_id',  
+        'taskable_type',  
+        'recurrence_type', 
+        'recurrence_end_date',
+        'reminder_enabled', 
+        'reminder_date',  
     ];
 
     public function assignee()

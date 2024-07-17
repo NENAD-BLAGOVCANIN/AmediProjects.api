@@ -27,6 +27,8 @@ class TasksController extends Controller
             'assigned_to' => 'nullable|exists:users,id',
             'taskable_id' => 'nullable|integer',
             'taskable_type' => 'nullable|string|in:App\Models\Contact,App\Models\Collection,App\Models\Lead',
+            'recurrence_type' => 'nullable|string|in:daily,weekly,monthly',
+            'recurrence_end_date' => 'nullable|date|after:due_date',
         ]);
       // Set default description if not provided
       if (empty($validatedData['description'])) {
@@ -51,8 +53,40 @@ class TasksController extends Controller
         } else {
             $task->save();
         }
+
+        if ($task->recurrence_type && $task->recurrence_end_date) {
+            $this->generateRecurringTasks($task);
+        }
     
         return response()->json($task, 201);
+    }
+    private function generateRecurringTasks(Task $task)
+    {
+    $currentDate = $task->due_date;
+    $endDate = $task->recurrence_end_date;
+    $recurrenceType = $task->recurrence_type;
+
+    while ($currentDate < $endDate) {
+        switch ($recurrenceType) {
+            case 'daily':
+                $currentDate = $currentDate->addDay();
+                break;
+            case 'weekly':
+                $currentDate = $currentDate->addWeek();
+                break;
+            case 'monthly':
+                $currentDate = $currentDate->addMonth();
+                break;
+        }
+
+        if ($currentDate > $endDate) {
+            break;
+        }
+
+        $newTask = $task->replicate();
+        $newTask->due_date = $currentDate;
+        $newTask->save();
+        }
     }
     public function getTaskableItems(Request $request)
 {

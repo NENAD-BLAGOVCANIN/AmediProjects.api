@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\StationController;
 
 
 Route::group(['prefix' => 'auth'], function () {
@@ -89,6 +90,13 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::get('/notifications', [NotificationsController::class, 'index']);
     Route::get('/notifications/{id}', [NotificationsController::class, 'show']);
+    Route::post('/notifications', [NotificationsController::class, 'store']);
+    Route::put('/notifications/{id}', [NotificationsController::class, 'update']);
+    Route::delete('/notifications/{id}', [NotificationsController::class, 'destroy']);
+    // stations
+    // Route::apiResource('stations', StationController::class);
+    Route::get('/stations', [StationController::class, 'index']);
+    Route::put('/stations/update/{project_id}', [StationController::class, 'updateStation']);
 
 
     Route::get('/leads', [LeadsController::class, 'index']);
