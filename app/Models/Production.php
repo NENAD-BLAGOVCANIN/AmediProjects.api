@@ -11,15 +11,27 @@ class Production extends Model
     use HasFactory;
 
     protected $fillable = [
-        'company', 'site_city', 'item', 'status', 'performed_by', 'notes',
+        'company',
+        'site_city',
+        'item',
+        'status',
+        'performed_by',
+        'notes',
+        'is_archive',
+        'plan_id',
+        'fileUpload',
+        'due_date',
     ];
+
     public function tasks()
     {
         return $this->morphMany(Task::class, 'taskable');
     }
+
     protected $attributes = [
         'status' => 'measuring',
     ];
+
     public function setStatusAttribute($value)
     {
         $allowedValues = ['planning', 'measuring', 'finished'];
@@ -28,5 +40,10 @@ class Production extends Model
         }
 
         $this->attributes['status'] = $value;
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 }

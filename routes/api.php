@@ -16,7 +16,7 @@ use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\StationController;
-
+use App\Http\Controllers\BonusController;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -111,7 +111,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/clients/{id}', [ClientsController::class, 'update']);
     Route::delete('/clients/{id}', [ClientsController::class, 'destroy']);
 
+   
 
+    Route::resource('bonuses', BonusController::class);
+    
     Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
 });
 

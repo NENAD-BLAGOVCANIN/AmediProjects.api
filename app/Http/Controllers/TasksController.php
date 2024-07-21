@@ -12,10 +12,10 @@ class TasksController extends Controller
     public function index()
     {
         $tasks = Task::with('assignee')
-        ->where('assigned_to', auth()->id())
-        ->orderBy('id', 'desc')
-        ->get();
-    return response()->json($tasks);
+            ->where('assigned_to', auth()->id())
+            ->orderBy('id', 'desc')
+            ->get();
+        return response()->json($tasks);
     }
 
     public function store(Request $request)
@@ -30,19 +30,20 @@ class TasksController extends Controller
             'recurrence_type' => 'nullable|string|in:daily,weekly,monthly',
             'recurrence_end_date' => 'nullable|date|after:due_date',
         ]);
-      // Set default description if not provided
-      if (empty($validatedData['description'])) {
-        $validatedData['description'] = 'אין תיאור';
 
+        // Set default description if not provided
+        if (empty($validatedData['description'])) {
+            $validatedData['description'] = 'אין תיאור';
         }
+
         // Ensure assigned_to is not null
         if (empty($validatedData['assigned_to'])) {
             $validatedData['assigned_to'] = auth()->id();
         }
+
         $task = new Task($validatedData);
-        $task->project_id = auth()->user()->currently_selected_project_id;
         $task->status = Task::STATUS_TODO;
-    
+
         if ($request->filled('taskable_id') && $request->filled('taskable_type')) {
             $taskable = $request->input('taskable_type')::find($request->input('taskable_id'));
             if ($taskable) {
@@ -57,85 +58,83 @@ class TasksController extends Controller
         if ($task->recurrence_type && $task->recurrence_end_date) {
             $this->generateRecurringTasks($task);
         }
-    
+
         return response()->json($task, 201);
     }
+
     private function generateRecurringTasks(Task $task)
     {
-    $currentDate = $task->due_date;
-    $endDate = $task->recurrence_end_date;
-    $recurrenceType = $task->recurrence_type;
+        $currentDate = $task->due_date;
+        $endDate = $task->recurrence_end_date;
+        $recurrenceType = $task->recurrence_type;
 
-    while ($currentDate < $endDate) {
-        switch ($recurrenceType) {
-            case 'daily':
-                $currentDate = $currentDate->addDay();
-                break;
-            case 'weekly':
-                $currentDate = $currentDate->addWeek();
-                break;
-            case 'monthly':
-                $currentDate = $currentDate->addMonth();
-                break;
-        }
+        while ($currentDate < $endDate) {
+            switch ($recurrenceType) {
+                case 'daily':
+                    $currentDate = $currentDate->addDay();
+                    break;
+                case 'weekly':
+                    $currentDate = $currentDate->addWeek();
+                    break;
+                case 'monthly':
+                    $currentDate = $currentDate->addMonth();
+                    break;
+            }
 
-        if ($currentDate > $endDate) {
-            break;
-        }
+            if ($currentDate > $endDate) {
+                break;
+            }
 
-        $newTask = $task->replicate();
-        $newTask->due_date = $currentDate;
-        $newTask->save();
+            $newTask = $task->replicate();
+            $newTask->due_date = $currentDate;
+            $newTask->save();
         }
     }
+
     public function getTaskableItems(Request $request)
-{
-    $request->validate([
-        'taskable_type' => 'required|string|in:App\\Models\\Contact,App\\Models\\Collection,App\\Models\\Lead',
-    ]);
+    {
+        $request->validate([
+            'taskable_type' => 'required|string|in:App\\Models\\Contact,App\\Models\\Collection,App\\Models\\Lead',
+        ]);
 
-    $taskableType = $request->input('taskable_type');
-    $items = $taskableType::select('id', 'name')->get(); // Adjust the select fields as necessary
+        $taskableType = $request->input('taskable_type');
+        $items = $taskableType::select('id', 'name')->get(); // Adjust the select fields as necessary
 
-    return response()->json($items);
-}
-
-
-public function assign(Request $request)
-{
-    $validatedData = $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'task_id' => 'required|exists:tasks,id',
-        'taskable_id' => 'nullable|integer',
-        'taskable_type' => 'nullable|string|in:App\Models\Contact,App\Models\Collection,App\Models\Lead',
-    ]);
-
-    $task = Task::findOrFail($validatedData['task_id']);
-    $task->assigned_to = $validatedData['user_id'];
-    $task->project_id = $validatedData['project_id'] ?? $task->project_id;
-
-    if ($request->filled('taskable_id') && $request->filled('taskable_type')) {
-        $taskable = $validatedData['taskable_type']::find($validatedData['taskable_id']);
-        if ($taskable) {
-            $task->taskable_id = $validatedData['taskable_id'];
-            $task->taskable_type = $validatedData['taskable_type'];
-        } else {
-            return response()->json(['error' => 'Invalid taskable ID or type'], 400);
-        }
+        return response()->json($items);
     }
 
-    $task->save();
+    public function assign(Request $request)
+    {
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'task_id' => 'required|exists:tasks,id',
+            'taskable_id' => 'nullable|integer',
+            'taskable_type' => 'nullable|string|in:App\Models\Contact,App\Models\Collection,App\Models\Lead',
+        ]);
 
-    $user = User::findOrFail($validatedData['user_id']);
-    $notificationTitle = "You have a new task.";
-    $notificationBody = "Hello! Someone just assigned a new task to you. Go to the tasks page to check it out.";
+        $task = Task::findOrFail($validatedData['task_id']);
+        $task->assigned_to = $validatedData['user_id'];
 
-    NotificationHelper::createNotificationForUser($user, $notificationTitle, $notificationBody);
+        // if ($request->filled('taskable_id') && $request->filled('taskable_type')) {
+        //     $taskable = $validatedData['taskable_type']::find($validatedData['taskable_id']);
+        //     if ($taskable) {
+        //         $task->taskable_id = $validatedData['taskable_id'];
+        //         $task->taskable_type = $validatedData['taskable_type'];
+        //     } else {
+        //         return response()->json(['error' => 'Invalid taskable ID or type'], 400);
+        //     }
+        // }
 
-    return response()->json($task->load('assignee'), 201);
-}
+        $task->save();
 
-    
+        $user = User::findOrFail($validatedData['user_id']);
+        $notificationTitle = "You have a new task.";
+        $notificationBody = "Hello! Someone just assigned a new task to you. Go to the tasks page to check it out.";
+
+        NotificationHelper::createNotificationForUser($user, $notificationTitle, $notificationBody);
+
+        return response()->json($task->load('assignee'), 201);
+    }
 
     public function show($id)
     {
@@ -149,17 +148,18 @@ public function assign(Request $request)
             'subject' => 'nullable|string',
             'description' => 'nullable|string',
             'lead_id' => 'nullable|exists:leads,id',
-            'project_id' => 'required|exists:projects,id',
             'assigned_to' => 'nullable|exists:users,id',
             'phone' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'due_date' => 'nullable|date',
             'status' => 'required|string',
         ]);
+
         // Set default description if not provided
         if (empty($validatedData['description'])) {
             $validatedData['description'] = 'אין תיאור';
         }
+
         $task = Task::findOrFail($id);
         $task->update($validatedData);
 

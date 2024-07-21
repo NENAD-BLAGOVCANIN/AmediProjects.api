@@ -34,7 +34,7 @@ class Task extends Model
 
     public function assignee()
     {
-        return $this->hasOne('App\Models\User', 'id', 'assigned_to');
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 
     public function taskable()

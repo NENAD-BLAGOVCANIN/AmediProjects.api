@@ -22,12 +22,18 @@ class ProductionController extends Controller
             'status' => 'nullable|string|in:planning,measuring,finished',
             'performed_by' => 'nullable|string',
             'notes' => 'nullable|string',
+            'plan_id' => 'nullable|string',
+            'fileUpload' => 'nullable|string',
+            'due_date' => 'nullable|date',
         ]);
 
         // Set default status if not provided
         if (!isset($validatedData['status'])) {
             $validatedData['status'] = 'measuring';
         }
+
+        // Set is_archive to false by default
+        $validatedData['is_archive'] = false;
 
         $production = Production::create($validatedData);
 
@@ -51,6 +57,10 @@ class ProductionController extends Controller
             'status' => 'nullable|string|in:planning,measuring,finished',
             'performed_by' => 'nullable|string',
             'notes' => 'nullable|string',
+            'is_archive' => 'boolean',
+            'plan_id' => 'nullable|string',
+            'fileUpload' => 'nullable|string',
+            'due_date' => 'nullable|date',
         ]);
 
         // Set default status if not provided
@@ -66,8 +76,9 @@ class ProductionController extends Controller
     public function destroy($id)
     {
         $production = Production::findOrFail($id);
-        $production->delete();
+        $production->is_archive = true;
+        $production->save();
 
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Production archived successfully']);
     }
 }

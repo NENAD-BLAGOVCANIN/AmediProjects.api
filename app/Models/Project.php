@@ -29,12 +29,14 @@ class Project extends Model
     {
         return $this->belongsToMany(User::class, 'project_users');
     }
+
     public function stations()
     {
         return $this->belongsToMany(Station::class, 'project_station')
                     ->withPivot('entry_time', 'due_date')
                     ->withTimestamps();
     }
+
     protected static function booted()
     {
         static::creating(function ($project) {
@@ -45,5 +47,15 @@ class Project extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function productions()
+    {
+        return $this->hasMany(Production::class);
+    }
+
+    public function collections()
+    {
+        return $this->hasMany(Collection::class);
     }
 }

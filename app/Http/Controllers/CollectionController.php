@@ -53,7 +53,10 @@ class CollectionController extends Controller
             'guarantee_end_date'=> 'nullable|string',
         ]);
 
-        return Collection::create($request->all());
+        $data = $request->all();
+        $data['is_archive'] = false;
+
+        return Collection::create($data);
     }
 
     /**
@@ -112,8 +115,9 @@ class CollectionController extends Controller
      */
     public function destroy(Collection $collection)
     {
-        $collection->delete();
+        $collection->is_archive = true;
+        $collection->save();
 
-        return response()->json(['message' => 'Collection deleted successfully']);
+        return response()->json(['message' => 'Collection archived successfully']);
     }
 }

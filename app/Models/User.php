@@ -11,7 +11,7 @@ use App\Models\Role;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -19,7 +19,6 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'profile_image',
     ];
-
 
     protected $hidden = [
         'password',
@@ -47,7 +46,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function project()
     {
-        return $this->hasOne('App\Models\Project', 'id', 'currently_selected_project_id');
+        return $this->hasOne(Project::class, 'id', 'currently_selected_project_id');
     }
 
     protected static function booted()
@@ -78,4 +77,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Notification::class);
     }
 
+    // New relationship for tasks
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
 }

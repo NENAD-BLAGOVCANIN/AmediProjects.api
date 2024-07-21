@@ -33,7 +33,7 @@ class ContactsController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'nullable|email',
             'title' => 'nullable|string',
             'city' => 'nullable|string',
             'address' => 'nullable|string',
@@ -62,7 +62,7 @@ class ContactsController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'nullable|email',
             'title' => 'nullable|string',
             'city' => 'nullable|string',
             'address' => 'nullable|string',
