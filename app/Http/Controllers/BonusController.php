@@ -9,13 +9,14 @@ class BonusController extends Controller
     public function index()
     {
         $bonuses = Bonus::all();
-        return view('bonuses.index', compact('bonuses'));
+    
+        return response()->json($bonuses);
     }
 
-    public function create()
-    {
-        return view('bonuses.create');
-    }
+    // public function create()
+    // {
+    //     return view('bonuses.create');
+    // }
 
     public function store(Request $request)
     {

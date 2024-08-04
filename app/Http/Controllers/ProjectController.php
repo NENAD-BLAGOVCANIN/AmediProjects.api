@@ -30,45 +30,53 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string',
+            'company_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'amount' => 'nullable|numeric',
+            'accounting_phone' => 'nullable|string|max:255',
+            'accounting_manager_name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'company_number' => 'nullable|string|max:255',
+            'project_manager_name' => 'nullable|string|max:255',
+            'project_manager_phone' => 'nullable|string|max:255',
+            'project_manager_email' => 'nullable|email|max:255',
+            'contact_person' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'image' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'company_name' => 'nullable|string',
-            'location' => 'nullable|string',
-            'contact_person' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'user_ids' => 'nullable|array',
-            'user_ids.*' => 'exists:users,id',
-            'company_number' => 'nullable|string',
-            'accounting_phone' => 'nullable|string',
-            'project_manager_phone' => 'nullable|string',
-            'accounting_email' => 'nullable|string',
-            'project_manager_email' => 'nullable|string',
-            'project_manager_name' => 'nullable|string',
-            'accounting_manager_name' => 'nullable|string',
+            'file_url' => 'nullable|string|max:255',
+            'products' => 'nullable|array',
         ]);
-
-        if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('project_files', 'public');
-            $validatedData['file_url'] = Storage::url($path);
-        }
-
-        $user = auth()->user();
 
         $project = Project::create($validatedData);
 
-        // Attach the authenticated user to the project
-        $user = auth()->user();
-        $user->currently_selected_project_id = $project->id;
-        $user->save();
-        $project->users()->attach($user->id);
+        // Create a new collection entry
+        Collection::create([
+            'project_id' => $project->id,
+            'company_name' => $project->company_name,
+            'project_name' => $project->name,
+            'contact_person' => $project->contact_person,
+            'project_manager_mobile' => $project->project_manager_phone,
+            'email' => $project->project_manager_email,
+            'accounting_manager_mobile' => $project->accounting_phone,
+        ]);
 
-        // Attach additional users to the project
-        if (!empty($validatedData['user_ids'])) {
-            foreach ($validatedData['user_ids'] as $userId) {
-                $project->users()->attach($userId, ['role' => 'member']);
-            }
-        }
+        // Create a new production entry
+        Production::create([
+            'project_id' => $project->id,
+            'company' => $project->company_name,
+            'site_city' => $project->location,
+        ]);
+
+        // Generate a notification
+        $notificationTitle = 'New Project Created';
+        $notificationBody = "A new project named '{$project->name}' has been created.";
+        Notification::create([
+            'title' => $notificationTitle,
+            'body' => $notificationBody,
+            'user_id' => auth()->id(), // assuming the user is authenticated
+        ]);
 
         return response()->json($project, 201);
     }

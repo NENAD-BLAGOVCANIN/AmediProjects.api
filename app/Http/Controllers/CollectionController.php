@@ -15,6 +15,12 @@ class CollectionController extends Controller
         return Collection::all();
     }
 
+    public function getSumOfDebt()
+    {
+         $sumOfDebt = Collection::where('is_archive', 0)->sum('debt');
+        return response()->json(['sum_of_debt' => $sumOfDebt]);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

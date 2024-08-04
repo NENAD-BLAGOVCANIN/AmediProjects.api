@@ -17,6 +17,9 @@ use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\StationController;
 use App\Http\Controllers\BonusController;
+use App\Http\Controllers\SummaryDayController;
+use App\Http\Controllers\SummaryInstallationController;
+use App\Http\Controllers\SummaryPlannerController;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -39,6 +42,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/profile/image', [ProfileImageController::class, 'updateProfileImage']);
 
     // collections
+    Route::get('/collections/sum-debt', [CollectionController::class, 'getSumOfDebt']);
     Route::get('collections', [CollectionController::class, 'index']);
     Route::post('collections', [CollectionController::class, 'store']);
     Route::get('collections/{collection}', [CollectionController::class, 'show']);
@@ -58,8 +62,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/contacts/{id}', [ContactsController::class, 'show']);
     Route::put('/contacts/{id}', [ContactsController::class, 'update']);
     Route::delete('/contacts/{id}', [ContactsController::class, 'destroy']);
-    
-    
+    // summary_installations
+    Route::apiResource('summary_installations', SummaryInstallationController::class);
+    // summary_planners
+    Route::apiResource('summary_planners', SummaryPlannerController::class);
+
     Route::get('/projects', [ProjectController::class, 'index']);
     Route::get('/my-projects', [ProjectController::class, 'myProjects']);
     Route::get('/project-info', [ProjectController::class, 'projectInfo']);
@@ -78,6 +85,13 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
 
+    // summaryDay
+    
+    Route::get('/summary-days', [SummaryDayController::class, 'index']);
+    Route::post('/summary-days', [SummaryDayController::class, 'store']);
+    Route::get('/summary-days/{summaryDay}', [SummaryDayController::class, 'show']);
+    Route::put('/summary-days/{summaryDay}', [SummaryDayController::class, 'update']);
+    Route::delete('/summary-days/{summaryDay}', [SummaryDayController::class, 'destroy']);
 
     Route::get('/tasks', [TasksController::class, 'index']);
     Route::post('/tasks', [TasksController::class, 'store']);
@@ -86,6 +100,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/tasks/{id}', [TasksController::class, 'update']);
     Route::delete('/tasks/{id}', [TasksController::class, 'destroy']);
     Route::get('taskable-items', [TasksController::class, 'getTaskableItems']);
+    Route::get('/tasks-with-users', [TasksController::class, 'allTasksWithUsers']);
 
 
     Route::get('/notifications', [NotificationsController::class, 'index']);
@@ -110,10 +125,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/clients/{id}', [ClientsController::class, 'show']);
     Route::put('/clients/{id}', [ClientsController::class, 'update']);
     Route::delete('/clients/{id}', [ClientsController::class, 'destroy']);
-
-   
-
-    Route::resource('bonuses', BonusController::class);
+    
+    
+    
+    Route::get('/bonuses', [BonusController::class, 'index']);
+    // Route::resource('bonuses', BonusController::class);
     
     Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
 });

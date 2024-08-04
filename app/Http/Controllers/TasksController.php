@@ -9,6 +9,12 @@ use App\Models\User;
 
 class TasksController extends Controller
 {
+
+    public function allTasksWithUsers()
+    {
+        $tasks = Task::with('assignee')->get(); // Assuming the relationship is called 'assignee'
+        return response()->json($tasks);
+    }
     public function index()
     {
         $tasks = Task::with('assignee')

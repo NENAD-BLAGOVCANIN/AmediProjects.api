@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Station;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class StationController extends Controller
 {
@@ -72,12 +74,12 @@ class StationController extends Controller
         $validatedData = $request->validate([
             'station_id' => 'required|integer|exists:stations,id',
         ]);
-
-        // Find the record in the PROJECT_STATION table using project_id and update the station_id
-        $affected = DB::table('PROJECT_STATION')
+    
+        // Find the record in the project_station table using project_id and update the station_id
+        $affected = DB::table('project_station') // Make sure DB is imported
             ->where('project_id', $project_id)
             ->update(['station_id' => $validatedData['station_id']]);
-
+    
         // Check if the update was successful
         if ($affected) {
             return response()->json(['message' => 'Station updated successfully'], 200);
