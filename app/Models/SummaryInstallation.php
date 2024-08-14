@@ -14,6 +14,10 @@ class SummaryInstallation extends Model
         'date',
         'worker_name',
         'bonuses',
+        'notes',
+        'city',
+        'employee_comments',
+        'delivery',
     ];
 
     protected $casts = [

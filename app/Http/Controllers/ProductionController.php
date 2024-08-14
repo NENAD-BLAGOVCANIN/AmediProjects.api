@@ -81,4 +81,11 @@ class ProductionController extends Controller
 
         return response()->json(['message' => 'Production archived successfully']);
     }
+
+    public function getActivePlanningProductions()
+{
+    $activePlannings = Production::where('status', 'planning')->count();
+
+    return response()->json(['active_plannings' => $activePlannings]);
+}
 }

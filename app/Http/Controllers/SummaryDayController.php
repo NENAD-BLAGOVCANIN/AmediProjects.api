@@ -72,4 +72,16 @@ class SummaryDayController extends Controller
         $summaryDay->delete();
         return response()->json(['message' => 'Summary day deleted successfully']);
     }
+
+    
+    public function getCollectionSummary()
+    {
+        $summaries = SummaryDay::where('user_id', Auth::id())
+            ->orderBy('id', 'desc')
+            ->get(['collected_today', 'future_collection', 'problems', 'created_at']);
+    
+        return response()->json($summaries);
+    }
+    
+
 }

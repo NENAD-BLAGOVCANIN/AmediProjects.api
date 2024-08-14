@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -18,7 +19,11 @@ class SummaryInstallationController extends Controller
             'project_name' => 'required|string',
             'date' => 'nullable|date',
             'worker_name' => 'nullable|string',
-            'bonuses' => 'nullable|json'
+            'bonuses' => 'nullable|json',
+            'notes' => 'nullable|string',
+            'city' => 'nullable|string',
+            'employee_comments' => 'nullable|string',
+            'delivery' => 'nullable|string',
         ]);
 
         $summaryInstallation = SummaryInstallation::create($validatedData);
@@ -37,7 +42,11 @@ class SummaryInstallationController extends Controller
             'project_name' => 'required|string',
             'date' => 'nullable|date',
             'worker_name' => 'nullable|string',
-            'bonuses' => 'nullable|json'
+            'bonuses' => 'nullable|json',
+            'notes' => 'nullable|string',
+            'city' => 'nullable|string',
+            'employee_comments' => 'nullable|string',
+            'delivery' => 'nullable|string',
         ]);
 
         $summaryInstallation = SummaryInstallation::findOrFail($id);

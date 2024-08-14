@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\Production;
+use App\Models\Collection;
+use App\Models\Station;
+use App\Models\ProjectProduct;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
@@ -48,9 +53,9 @@ class ProjectController extends Controller
             'file_url' => 'nullable|string|max:255',
             'products' => 'nullable|array',
         ]);
-
+    
         $project = Project::create($validatedData);
-
+    
         // Create a new collection entry
         Collection::create([
             'project_id' => $project->id,
@@ -61,14 +66,29 @@ class ProjectController extends Controller
             'email' => $project->project_manager_email,
             'accounting_manager_mobile' => $project->accounting_phone,
         ]);
-
+    
         // Create a new production entry
         Production::create([
             'project_id' => $project->id,
             'company' => $project->company_name,
             'site_city' => $project->location,
         ]);
+          // Create a new station entry
+          if ($request->filled('station_id')) {
+            $station = Station::find($request->station_id);
 
+            if ($station) {
+                // Create a new entry in the pivot table
+                $project->stations()->attach($station->id, [
+                    'entry_time' => now(),
+                    'due_date' => now()->addWeek(),
+                    // other pivot fields
+                ]);
+            } else {
+                // Handle the case where the station ID is invalid
+                return response()->json(['error' => 'Invalid station ID'], 404);
+            }
+        }
         // Generate a notification
         $notificationTitle = 'New Project Created';
         $notificationBody = "A new project named '{$project->name}' has been created.";
@@ -77,9 +97,18 @@ class ProjectController extends Controller
             'body' => $notificationBody,
             'user_id' => auth()->id(), // assuming the user is authenticated
         ]);
-
+    
         return response()->json($project, 201);
     }
+    public function getProjectsStartedPerMonth()
+{
+    $projects = Project::selectRaw('MONTH(created_at) as month, COUNT(*) as projects_started')
+        ->whereYear('created_at', date('Y'))
+        ->groupBy('month')
+        ->get();
+
+    return response()->json($projects);
+}
 
     public function switchProject(Request $request)
     {
@@ -171,4 +200,12 @@ class ProjectController extends Controller
             abort(403, 'Access denied.');
         }
     }
+
+    public function getProjectDetails($id)
+    {
+        $project = Project::with(['collections', 'productions', 'products', 'stations'])->findOrFail($id);
+        return response()->json($project);
+    }
+
+    
 }

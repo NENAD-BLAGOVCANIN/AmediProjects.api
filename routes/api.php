@@ -20,6 +20,8 @@ use App\Http\Controllers\BonusController;
 use App\Http\Controllers\SummaryDayController;
 use App\Http\Controllers\SummaryInstallationController;
 use App\Http\Controllers\SummaryPlannerController;
+use App\Http\Controllers\MonthlyCollectionController;
+use App\Http\Controllers\PdfController;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -27,6 +29,9 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
     Route::post('refresh', [AuthController::class, 'refresh'])->middleware('auth:api');
 });
+    // make pdf
+    Route::post('/makePdf', [PdfController::class, 'generatePdf']);
+    Route::post('/makeAccountDetailsPdf', [PdfController::class, 'generateAccountDetailsPdf']);
 
 
 Route::group(['middleware' => 'auth:api'], function () {
@@ -48,6 +53,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('collections/{collection}', [CollectionController::class, 'show']);
     Route::put('collections/{collection}', [CollectionController::class, 'update']);
     Route::delete('collections/{collection}', [CollectionController::class, 'destroy']);
+    Route::put('/collections/{id}/archive', [CollectionController::class, 'updateArchiveStatus']);
 
     // productions
     Route::get('productions', [ProductionController::class, 'index']);
@@ -55,6 +61,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('productions/{production}', [ProductionController::class, 'show']);
     Route::put('productions/{production}', [ProductionController::class, 'update']);
     Route::delete('productions/{production}', [ProductionController::class, 'destroy']);
+    Route::get('/productions/active-planning', [ProductionController::class, 'getActivePlanningProductions']);
 
 
     Route::get('/contacts', [ContactsController::class, 'index']);
@@ -76,14 +83,16 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('/project', [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
     Route::get('/project/members', [ProjectController::class, 'projectMembers']);
-
+    Route::get('/project-details/{id}', [ProjectController::class, 'getProjectDetails']);
     Route::post('/projects/image', [ProfileImageController::class, 'updateProjectImage']);
-    
+    Route::get('/projects/started-per-month', [ProjectController::class, 'getProjectsStartedPerMonth']);
+
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/products/{product}', [ProductController::class, 'show']);
     Route::put('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
 
     // summaryDay
     
@@ -92,6 +101,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/summary-days/{summaryDay}', [SummaryDayController::class, 'show']);
     Route::put('/summary-days/{summaryDay}', [SummaryDayController::class, 'update']);
     Route::delete('/summary-days/{summaryDay}', [SummaryDayController::class, 'destroy']);
+    Route::get('/summary-days/collection-summary', [SummaryDayController::class, 'getCollectionSummary']);
 
     Route::get('/tasks', [TasksController::class, 'index']);
     Route::post('/tasks', [TasksController::class, 'store']);
@@ -101,7 +111,14 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('/tasks/{id}', [TasksController::class, 'destroy']);
     Route::get('taskable-items', [TasksController::class, 'getTaskableItems']);
     Route::get('/tasks-with-users', [TasksController::class, 'allTasksWithUsers']);
+    Route::put('/tasks/{id}/archive', [TasksController::class, 'updateArchiveStatus']);
 
+    // MonthlyCollectionController
+    Route::post('/monthly-collections', [MonthlyCollectionController::class, 'store']);
+    Route::get('/monthly-collections', [MonthlyCollectionController::class, 'index']);
+    Route::get('/monthly-collections/{id}', [MonthlyCollectionController::class, 'show']);
+    Route::put('/monthly-collections/{id}', [MonthlyCollectionController::class, 'update']);
+    Route::get('/monthly-collections/collected-this-month', [MonthlyCollectionController::class, 'getAmountCollectedThisMonth']);
 
     Route::get('/notifications', [NotificationsController::class, 'index']);
     Route::get('/notifications/{id}', [NotificationsController::class, 'show']);

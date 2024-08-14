@@ -15,6 +15,18 @@ class TasksController extends Controller
         $tasks = Task::with('assignee')->get(); // Assuming the relationship is called 'assignee'
         return response()->json($tasks);
     }
+    public function updateArchiveStatus(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'is_archive' => 'required|boolean',
+        ]);
+
+        $task = Task::findOrFail($id);
+        $task->is_archive = $validatedData['is_archive'];
+        $task->save();
+
+        return response()->json($task, 200);
+    }
     public function index()
     {
         $tasks = Task::with('assignee')

@@ -10,6 +10,26 @@ class CollectionController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public $timestamps = false;
+
+    public function updateArchiveStatus(Request $request, $id)
+    {
+        $collection = Collection::findOrFail($id);
+        $collection->is_archive = $request->is_archive;
+        $collection->save();
+
+        return response()->json(['message' => 'Archive status updated successfully']);
+    }
+ 
+    public function getCollectionSummary()
+    {
+        $summary = MonthlyCollection::selectRaw('project_id, SUM(amount_collected) as total_collected')
+            ->groupBy('project_id')
+            ->get();
+    
+        return response()->json($summary);
+    }
+    
     public function index()
     {
         return Collection::all();
@@ -45,6 +65,7 @@ class CollectionController extends Controller
             'paymnet_plus' => 'nullable|string',
             'remaining_amount_to_collect' => 'nullable|string',
             'company_name' => 'nullable|string',
+            'retention_5' => 'nullable|string',
             'cumulative_offset' => 'nullable|string',
             'offset_instead_of_guarantee' => 'nullable|string',
             'payment_status' => 'nullable|string',
@@ -90,6 +111,7 @@ class CollectionController extends Controller
             'debt' => 'nullable|string',
             'first_line_sent_whatsapp' => 'nullable|string',
             'details' => 'nullable|string',
+            'retention_5' => 'nullable|string',
             'second_line_sent_email_details' => 'nullable|string',
             'whatsapp_2' => 'nullable|string',
             'details_2' => 'nullable|string',
