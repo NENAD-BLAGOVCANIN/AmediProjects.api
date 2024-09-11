@@ -17,7 +17,16 @@ class BonusController extends Controller
     // {
     //     return view('bonuses.create');
     // }
+    public function getBonusById($id)
+    {
+        $bonus = Bonus::find($id);
 
+        if ($bonus) {
+            return response()->json($bonus);
+        } else {
+            return response()->json(['message' => 'Bonus not found'], 404);
+        }
+    }
     public function store(Request $request)
     {
         $request->validate([

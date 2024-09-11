@@ -10,7 +10,7 @@ class MonthlyCollection extends Model
     use HasFactory;
     
     public $timestamps = false;
-    protected $fillable = ['project_id', 'month', 'year', 'amount_collected'];
+    protected $fillable = ['project_id', 'month', 'year', 'amount_collected', 'is_archive'];
 
     public function project()
     {

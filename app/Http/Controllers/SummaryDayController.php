@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\SummaryDay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SummaryDayController extends Controller
 {
@@ -76,6 +77,8 @@ class SummaryDayController extends Controller
     
     public function getCollectionSummary()
     {
+        Log::info('getCollectionSummary method called');
+
         $summaries = SummaryDay::where('user_id', Auth::id())
             ->orderBy('id', 'desc')
             ->get(['collected_today', 'future_collection', 'problems', 'created_at']);

@@ -5,33 +5,44 @@ use App\Http\Controllers\Controller;
 use App\Models\Station;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Log;
 
 class StationController extends Controller
 {
     // Fetch all stations
     public function index()
     {
-        $stations = Station::with('projects')->get();
+        Log::info('StationController index method called');
+
+        $stations = Station::with(['projects' => function ($query) {
+            $query->select('projects.id', 'projects.name', 'projects.company_name');
+        }])->get();
+        Log::info('station', ['stations' => $stations]);
 
         $result = [];
         foreach ($stations as $station) {
-          $result["stations"] = $stations;
+            $stationData = [
+                'station_id' => $station->id,
+                'station_name' => $station->name,
+                'projects' => []
+            ];
+    
             foreach ($station->projects as $project) {
-                $result[] = [
-                    // 'all_stations'=>$stations,
+                $stationData['projects'][] = [
                     'project_id' => $project->id,
                     'project_name' => $project->name,
-                    'station_id' => $station->id,
-                    'station_name' => $station->name,
+                    'company_name' => $project->company_name,
                     'entry_time' => $project->pivot->entry_time,
                     'due_date' => $project->pivot->due_date,
                 ];
             }
+    
+            $result[] = $stationData;
         }
-
-        return response()->json($result);
+    
+        return response()->json(['stations' => $result]);
     }
+    
 
     // Store a new station
     public function store(Request $request)

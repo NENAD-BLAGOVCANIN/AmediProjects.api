@@ -74,6 +74,7 @@ class CollectionController extends Controller
             'collection_contact'=> 'nullable|string', 
             'amount_collected_this_month' => 'nullable|string',
             'is_archived' => 'nullable|int',
+            'have_problem' => 'nullable|int',
             'last_invoice_issue_date'=> 'nullable|string',
             'last_detail_sent_date'=> 'nullable|string',
             'offset_instead_of_guarantee_before_vat'=> 'nullable|string',
@@ -131,6 +132,7 @@ class CollectionController extends Controller
             'last_detail_sent_date'=> 'nullable|string',
             'offset_instead_of_guarantee_before_vat'=> 'nullable|string',
             'guarantee_end_date'=> 'nullable|string',
+            'have_problem'=>'nullable|int',
         ]);
 
         $collection->update($request->all());

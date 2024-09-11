@@ -9,7 +9,7 @@ class Task extends Model
 {
     use HasFactory;
 
-    const STATUS_TODO = 'todo';
+ 
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_ON_HOLD = 'on_hold';
     const STATUS_DONE = 'done';

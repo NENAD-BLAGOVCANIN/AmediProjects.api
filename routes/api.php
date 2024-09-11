@@ -32,6 +32,10 @@ Route::group(['prefix' => 'auth'], function () {
     // make pdf
     Route::post('/makePdf', [PdfController::class, 'generatePdf']);
     Route::post('/makeAccountDetailsPdf', [PdfController::class, 'generateAccountDetailsPdf']);
+    Route::post('/generate-pdf-and-send-email', [PdfController::class, 'generatePdfAndSendEmail']);
+    Route::post('/generate-pdf-and-send-email-daily', [PdfController::class, 'generateDailyPdfAndSendEmail']);
+    Route::post('/generate-pdf-and-send-email-weekly', [PdfController::class, 'generateWeeklyPdfAndSendEmail']);
+    Route::post('/generate-pdf-and-send-collection-daily', [PdfController::class, 'generateDailyCollectionPdfAndSendEmail']);
 
 
 Route::group(['middleware' => 'auth:api'], function () {
@@ -54,6 +58,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::put('collections/{collection}', [CollectionController::class, 'update']);
     Route::delete('collections/{collection}', [CollectionController::class, 'destroy']);
     Route::put('/collections/{id}/archive', [CollectionController::class, 'updateArchiveStatus']);
+    Route::put('/collections/{id}', [CollectionController::class, 'update']);
 
     // productions
     Route::get('productions', [ProductionController::class, 'index']);
@@ -61,7 +66,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('productions/{production}', [ProductionController::class, 'show']);
     Route::put('productions/{production}', [ProductionController::class, 'update']);
     Route::delete('productions/{production}', [ProductionController::class, 'destroy']);
-    Route::get('/productions/active-planning', [ProductionController::class, 'getActivePlanningProductions']);
+    Route::get('/productions-active-planning', [ProductionController::class, 'getActivePlanningProductions']);
 
 
     Route::get('/contacts', [ContactsController::class, 'index']);
@@ -74,6 +79,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     // summary_planners
     Route::apiResource('summary_planners', SummaryPlannerController::class);
 
+    Route::get('/projects-started', [ProjectController::class, 'getProjectsStartedPerMonth']);
     Route::get('/projects', [ProjectController::class, 'index']);
     Route::get('/my-projects', [ProjectController::class, 'myProjects']);
     Route::get('/project-info', [ProjectController::class, 'projectInfo']);
@@ -85,7 +91,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/project/members', [ProjectController::class, 'projectMembers']);
     Route::get('/project-details/{id}', [ProjectController::class, 'getProjectDetails']);
     Route::post('/projects/image', [ProfileImageController::class, 'updateProjectImage']);
-    Route::get('/projects/started-per-month', [ProjectController::class, 'getProjectsStartedPerMonth']);
+    Route::get('/project-collections-summary', [ProjectController::class, 'getProjectCollectionsSummary']);
 
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
@@ -101,7 +107,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/summary-days/{summaryDay}', [SummaryDayController::class, 'show']);
     Route::put('/summary-days/{summaryDay}', [SummaryDayController::class, 'update']);
     Route::delete('/summary-days/{summaryDay}', [SummaryDayController::class, 'destroy']);
-    Route::get('/summary-days/collection-summary', [SummaryDayController::class, 'getCollectionSummary']);
+    Route::get('/summary-days-id', [SummaryDayController::class, 'getCollectionSummary']);
 
     Route::get('/tasks', [TasksController::class, 'index']);
     Route::post('/tasks', [TasksController::class, 'store']);
@@ -118,7 +124,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/monthly-collections', [MonthlyCollectionController::class, 'index']);
     Route::get('/monthly-collections/{id}', [MonthlyCollectionController::class, 'show']);
     Route::put('/monthly-collections/{id}', [MonthlyCollectionController::class, 'update']);
-    Route::get('/monthly-collections/collected-this-month', [MonthlyCollectionController::class, 'getAmountCollectedThisMonth']);
+    Route::get('/monthly-collections-collected-this-month', [MonthlyCollectionController::class, 'getAmountCollectedThisMonth']);
 
     Route::get('/notifications', [NotificationsController::class, 'index']);
     Route::get('/notifications/{id}', [NotificationsController::class, 'show']);
@@ -146,6 +152,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     
     
     Route::get('/bonuses', [BonusController::class, 'index']);
+    Route::get('/bonuses/{id}', [BonusController::class, 'getBonusById']); // New route for retrieving bonus by ID
+
     // Route::resource('bonuses', BonusController::class);
     
     Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);

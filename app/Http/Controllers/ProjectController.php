@@ -12,17 +12,19 @@ use App\Models\ProjectProduct;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::with('users')->get();
+        $projects = Project::with(['users', 'collections', 'productions', 'products', 'stations'])->get();
         return response()->json($projects);
     }
 
     public function myProjects(Request $request)
     {
+
         $user = auth()->user();
 
         $projects = Project::with('users')->whereHas('users', function ($query) use ($user) {
@@ -101,12 +103,14 @@ class ProjectController extends Controller
         return response()->json($project, 201);
     }
     public function getProjectsStartedPerMonth()
-{
+    {
+    Log::info('getProjectsStartedPerMonth method called');
     $projects = Project::selectRaw('MONTH(created_at) as month, COUNT(*) as projects_started')
-        ->whereYear('created_at', date('Y'))
-        ->groupBy('month')
-        ->get();
-
+    ->whereYear('created_at', date('Y'))
+    ->groupBy('month')
+    ->get();
+    
+    Log::info('getProjectsStartedPerMonth method called', ['request_data' => $projects]);
     return response()->json($projects);
 }
 
@@ -129,6 +133,7 @@ class ProjectController extends Controller
 
     public function projectInfo(Request $request)
     {
+        Log::info('projectInfo function called.', ['request_data' => $request->all()]);
         $user = auth()->user();
         $project = Project::findOrFail($user->currently_selected_project_id);
         return response()->json($project);
@@ -206,6 +211,21 @@ class ProjectController extends Controller
         $project = Project::with(['collections', 'productions', 'products', 'stations'])->findOrFail($id);
         return response()->json($project);
     }
-
+    public function getProjectCollectionsSummary()
+    {
+        $projects = Collection::with('monthlyCollections')
+            ->get()
+            ->map(function ($project) {
+                $totalCollected = $project->monthlyCollections->sum('amount_collected');
+                return [
+                    'project_name' => $project->project_name,
+                    'total_collected' => $totalCollected,
+                    'debt' => $project->debt - $totalCollected,
+                ];
+            });
+    
+        return response()->json($projects);
+    }
+    
     
 }

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Helpers\NotificationHelper;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+
 
 class TasksController extends Controller
 {
@@ -41,6 +43,8 @@ class TasksController extends Controller
         $validatedData = $request->validate([
             'subject' => 'nullable|string',
             'description' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|string',
             'due_date' => 'nullable|date',
             'assigned_to' => 'nullable|exists:users,id',
             'taskable_id' => 'nullable|integer',
@@ -60,7 +64,7 @@ class TasksController extends Controller
         }
 
         $task = new Task($validatedData);
-        $task->status = Task::STATUS_TODO;
+        $task->status = Task::STATUS_IN_PROGRESS;
 
         if ($request->filled('taskable_id') && $request->filled('taskable_type')) {
             $taskable = $request->input('taskable_type')::find($request->input('taskable_id'));
@@ -162,6 +166,9 @@ class TasksController extends Controller
 
     public function update(Request $request, $id)
     {
+
+        Log::info('update tasks controller index method called', ["id"=>$id]);
+
         $validatedData = $request->validate([
             'subject' => 'nullable|string',
             'description' => 'nullable|string',
@@ -172,6 +179,7 @@ class TasksController extends Controller
             'due_date' => 'nullable|date',
             'status' => 'required|string',
         ]);
+        Log::info('status before update', ['status' => $validatedData['status']]);
 
         // Set default description if not provided
         if (empty($validatedData['description'])) {
@@ -179,7 +187,9 @@ class TasksController extends Controller
         }
 
         $task = Task::findOrFail($id);
+        Log::info('update tasks controller update method task',["task"=>$task]);
         $task->update($validatedData);
+        Log::info('update tasks controller update method task updated',["updated"=>$task]);
 
         return response()->json($task, 200);
     }
@@ -191,4 +201,40 @@ class TasksController extends Controller
 
         return response()->json(null, 204);
     }
+
+
+
+    public static function moveUnfinishedTasksToNextBusinessDay()
+    {
+        // Get current date and time
+        $now = Carbon::now();
+        
+        // Find all tasks that are not done
+        $unfinishedTasks = Task::whereIn('status', [Task::STATUS_IN_PROGRESS, Task::STATUS_ON_HOLD])
+            ->where('due_date', '<=', $now)
+            ->get();
+
+        // Move them to the next business day
+        foreach ($unfinishedTasks as $task) {
+            $task->due_date = self::getNextBusinessDay($now);
+            $task->save();
+        }
+
+        // Send summary email
+        // self::sendDailySummaryEmail($unfinishedTasks);
+    }
+
+    private static function getNextBusinessDay($currentDate)
+    {
+        $nextBusinessDay = $currentDate->copy()->addDay();
+
+        // Check if the next day is a weekend (Saturday or Sunday)
+        while ($nextBusinessDay->isWeekend()) {
+            $nextBusinessDay->addDay();
+        }
+
+        return $nextBusinessDay;
+    }
+
+
 }
