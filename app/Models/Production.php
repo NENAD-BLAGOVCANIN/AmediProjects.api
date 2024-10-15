@@ -9,32 +9,25 @@ use App\Models\Task;
 class Production extends Model
 {
     use HasFactory;
+   
+    protected $fillable = ['company', 'project_id', 'site_city', 'item', 'status', 'performed_by', 'notes', 'is_archive', 'plan_id', 'due_date', 'urgency'];
 
-    protected $fillable = [
-        'company',
-        'site_city',
-        'item',
-        'status',
-        'performed_by',
-        'notes',
-        'is_archive',
-        'plan_id',
-        'fileUpload',
-        'due_date',
-    ];
-
+    public function items()
+    {
+        return $this->hasMany(ProductionItem::class);
+    }
     public function tasks()
     {
         return $this->morphMany(Task::class, 'taskable');
     }
 
     protected $attributes = [
-        'status' => 'measuring',
+        'status' => 'new',
     ];
 
     public function setStatusAttribute($value)
     {
-        $allowedValues = ['planning', 'measuring', 'finished'];
+        $allowedValues = ['new','planning', 'measuring', 'finished'];
         if (!in_array($value, $allowedValues)) {
             throw new \InvalidArgumentException("Invalid status value");
         }

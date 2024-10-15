@@ -22,6 +22,8 @@ use App\Http\Controllers\SummaryInstallationController;
 use App\Http\Controllers\SummaryPlannerController;
 use App\Http\Controllers\MonthlyCollectionController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\AccountDetailsController;
+use App\Http\Controllers\AccountController;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -36,6 +38,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('/generate-pdf-and-send-email-daily', [PdfController::class, 'generateDailyPdfAndSendEmail']);
     Route::post('/generate-pdf-and-send-email-weekly', [PdfController::class, 'generateWeeklyPdfAndSendEmail']);
     Route::post('/generate-pdf-and-send-collection-daily', [PdfController::class, 'generateDailyCollectionPdfAndSendEmail']);
+    Route::get('/weekly-count', [PdfController::class, 'getWeeklyOffersCount']);
+    Route::post('/previewAccountDetailsHtml', [PdfController::class, 'generateAccountDetailsHtml']);
 
 
 Route::group(['middleware' => 'auth:api'], function () {
@@ -59,15 +63,26 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('collections/{collection}', [CollectionController::class, 'destroy']);
     Route::put('/collections/{id}/archive', [CollectionController::class, 'updateArchiveStatus']);
     Route::put('/collections/{id}', [CollectionController::class, 'update']);
+    Route::get('/collections/weekly-count', [CollectionController::class, 'getWeeklyCollectionsCount']);
+
+   
+
 
     // productions
     Route::get('productions', [ProductionController::class, 'index']);
     Route::post('productions', [ProductionController::class, 'store']);
     Route::get('productions/{production}', [ProductionController::class, 'show']);
-    Route::put('productions/{production}', [ProductionController::class, 'update']);
+    Route::put('/productions/{id}', [ProductionController::class, 'update']);
     Route::delete('productions/{production}', [ProductionController::class, 'destroy']);
     Route::get('/productions-active-planning', [ProductionController::class, 'getActivePlanningProductions']);
+    Route::post('productions/{id}/upload-file', [ProductionController::class, 'uploadFile']);
+    Route::get('/productions/finished-count', [ProductionController::class, 'getFinishedPlansCount']);
+    Route::get('/productions/plans-over-four-days', [ProductionController::class, 'getPlansOverFourDaysInPlanning']);
 
+    Route::post('/saveAccountDetails', [AccountDetailsController::class, 'storeAccountDetails']);
+    Route::post('/accounts', [AccountController::class, 'store']);
+    Route::get('/accounts/summary', [AccountController::class, 'getAccountsSummary']);
+    Route::get('/accountDetails/totalAmountSent', [AccountDetailsController::class, 'getTotalAmountSent']);
 
     Route::get('/contacts', [ContactsController::class, 'index']);
     Route::post('/contacts', [ContactsController::class, 'store']);
@@ -92,6 +107,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/project-details/{id}', [ProjectController::class, 'getProjectDetails']);
     Route::post('/projects/image', [ProfileImageController::class, 'updateProjectImage']);
     Route::get('/project-collections-summary', [ProjectController::class, 'getProjectCollectionsSummary']);
+    Route::get('/projects/count-per-manager', [ProjectController::class, 'getProjectsCountPerManager']);
 
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
@@ -125,6 +141,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/monthly-collections/{id}', [MonthlyCollectionController::class, 'show']);
     Route::put('/monthly-collections/{id}', [MonthlyCollectionController::class, 'update']);
     Route::get('/monthly-collections-collected-this-month', [MonthlyCollectionController::class, 'getAmountCollectedThisMonth']);
+    Route::get('/monthly-collections/amount-collected-per-month', [MonthlyCollectionController::class, 'getAmountCollectedPerMonth']);
 
     Route::get('/notifications', [NotificationsController::class, 'index']);
     Route::get('/notifications/{id}', [NotificationsController::class, 'show']);
@@ -134,6 +151,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     // stations
     // Route::apiResource('stations', StationController::class);
     Route::get('/stations', [StationController::class, 'index']);
+    Route::post('/update-project-order', [StationController::class, 'updateProjectOrder']);
     Route::put('/stations/update/{project_id}', [StationController::class, 'updateStation']);
 
 
@@ -157,6 +175,17 @@ Route::group(['middleware' => 'auth:api'], function () {
     // Route::resource('bonuses', BonusController::class);
     
     Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
+    Route::get('/dashboard/weekly-new', [DashboardController::class, 'getWeeklyNewProjects']);
+    Route::get('/dashboard/weekly-price-offers', [DashboardController::class, 'getWeeklyPriceOffers']);
+    Route::get('/dashboard/weekly-new-projects', [DashboardController::class, 'getWeeklyNewProjects']);
+    Route::get('/dashboard/plans-over-four-days', [DashboardController::class, 'getPlansOverFourDays']);
+    Route::get('/dashboard/projects-per-manager', [DashboardController::class, 'getProjectsPerManager']);
+    Route::get('/dashboard/accounts-per-manager', [DashboardController::class, 'getAccountsPerManager']);
+    Route::get('/dashboard/amount-sent-details', [DashboardController::class, 'getAmountSentDetails']);
+    Route::get('/dashboard/account-details-sent', [DashboardController::class, 'getAccountDetailsSent']);
+    Route::get('/dashboard/amount-collected-per-month', [DashboardController::class, 'getAmountCollectedPerMonth']);
+    Route::get('/dashboard/collection-trends', [DashboardController::class, 'getCollectionTrends']); // גרף מגמה
+    Route::get('/dashboard/collection-breakdown', [DashboardController::class, 'getCollectionBreakdown']); // פירוט גבייה
 });
 
 Route::post('/handle-invite-link', [ProjectController::class, 'inviteLink']);

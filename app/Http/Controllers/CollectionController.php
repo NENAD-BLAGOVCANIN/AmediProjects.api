@@ -150,4 +150,21 @@ class CollectionController extends Controller
 
         return response()->json(['message' => 'Collection archived successfully']);
     }
+        public function getWeeklyCollectionsCount()
+    {
+        $count = Collection::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+        return response()->json(['weekly_collections_count' => $count]);
+    }
+
+    public function getAmountCollectedPerMonth()
+{
+    $collections = MonthlyCollection::select('year', 'month', DB::raw('SUM(amount_collected) as total_amount'))
+                    ->groupBy('year', 'month')
+                    ->orderBy('year', 'month')
+                    ->get();
+
+    return response()->json(['amount_collected_per_month' => $collections]);
+}
+
+
 }

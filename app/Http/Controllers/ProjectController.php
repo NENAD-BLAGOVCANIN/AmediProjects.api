@@ -74,6 +74,7 @@ class ProjectController extends Controller
             'project_id' => $project->id,
             'company' => $project->company_name,
             'site_city' => $project->location,
+            'status' => 'new',
         ]);
           // Create a new station entry
           if ($request->filled('station_id')) {
@@ -227,5 +228,13 @@ class ProjectController extends Controller
         return response()->json($projects);
     }
     
-    
+    public function getProjectsCountPerManager()
+{
+    $projects = Project::select('project_manager_name', DB::raw('count(*) as total'))
+                ->groupBy('project_manager_name');
+             
+
+    return response()->json(['projects_per_manager' => $projects]);
+}
+
 }

@@ -15,9 +15,9 @@ class StationController extends Controller
         Log::info('StationController index method called');
 
         $stations = Station::with(['projects' => function ($query) {
-            $query->select('projects.id', 'projects.name', 'projects.company_name');
+            $query->select('projects.id', 'projects.name', 'projects.company_name', 'projects.project_manager_name')
+                  ->orderBy('project_station.order');  // Order by the new 'order' column
         }])->get();
-        Log::info('station', ['stations' => $stations]);
 
         $result = [];
         foreach ($stations as $station) {
@@ -32,8 +32,11 @@ class StationController extends Controller
                     'project_id' => $project->id,
                     'project_name' => $project->name,
                     'company_name' => $project->company_name,
+                    'project_manager_name' => $project->project_manager_name,
                     'entry_time' => $project->pivot->entry_time,
                     'due_date' => $project->pivot->due_date,
+                    'installer' => $project->pivot->installer,
+                    'order' => $project->pivot->order,  // Include the order in the response
                 ];
             }
     
@@ -81,6 +84,8 @@ class StationController extends Controller
     }
     public function updateStation(Request $request, $project_id)
     {
+        Log::info('StationController updateStation method called');
+
         // Validate the request
         $validatedData = $request->validate([
             'station_id' => 'required|integer|exists:stations,id',
@@ -95,7 +100,90 @@ class StationController extends Controller
         if ($affected) {
             return response()->json(['message' => 'Station updated successfully'], 200);
         } else {
-            return response()->json(['message' => 'Record not found or update failed'], 404);
+            return response()->json(['message' => 'אתה באותה תחנה' ], 200);
         }
     }
+
+    public function updateProjectOrder(Request $request)
+    {
+        $validatedData = $request->validate([
+            'project_id' => 'required|integer|exists:project_station,project_id',
+            'station_id' => 'required|integer|exists:stations,id',
+            'new_order' => 'required|integer|min:0',
+        ]);
+
+        DB::transaction(function () use ($validatedData) {
+            $projectId = $validatedData['project_id'];
+            $newStationId = $validatedData['station_id'];
+            $newOrder = $validatedData['new_order'];
+
+            // Get current project information
+            $currentProject = DB::table('project_station')
+                ->where('project_id', $projectId)
+                ->first();
+
+            if ($currentProject->station_id != $newStationId) {
+                // Project is moving to a new station
+                // Decrease order of all projects in the old station with order > current order
+                DB::table('project_station')
+                    ->where('station_id', $currentProject->station_id)
+                    ->where('order', '>', $currentProject->order)
+                    ->decrement('order');
+
+                // Increase order of all projects in the new station with order >= new order
+                DB::table('project_station')
+                    ->where('station_id', $newStationId)
+                    ->where('order', '>=', $newOrder)
+                    ->increment('order');
+
+                // Update the project's station and order
+                DB::table('project_station')
+                    ->where('project_id', $projectId)
+                    ->update([
+                        'station_id' => $newStationId,
+                        'order' => $newOrder
+                    ]);
+            } else {
+                // Project is reordering within the same station
+                if ($newOrder > $currentProject->order) {
+                    // Moving down, decrease orders of projects between current and new
+                    DB::table('project_station')
+                        ->where('station_id', $newStationId)
+                        ->whereBetween('order', [$currentProject->order + 1, $newOrder])
+                        ->decrement('order');
+                } else {
+                    // Moving up, increase orders of projects between new and current
+                    DB::table('project_station')
+                        ->where('station_id', $newStationId)
+                        ->whereBetween('order', [$newOrder, $currentProject->order - 1])
+                        ->increment('order');
+                }
+
+                // Update the project's order
+                DB::table('project_station')
+                    ->where('project_id', $projectId)
+                    ->update(['order' => $newOrder]);
+            }
+
+            // Normalize orders to ensure they are consecutive
+            $this->normalizeOrders($newStationId);
+        });
+
+        return response()->json(['message' => 'Project order updated successfully'], 200);
+    }
+
+    private function normalizeOrders($stationId)
+    {
+        $projects = DB::table('project_station')
+            ->where('station_id', $stationId)
+            ->orderBy('order')
+            ->get();
+
+        foreach ($projects as $index => $project) {
+            DB::table('project_station')
+                ->where('project_id', $project->project_id)
+                ->update(['order' => $index]);
+        }
+    }
+
 }

@@ -37,14 +37,14 @@
         <h1>פירוט חשבון</h1>
         <p>לקוח: {{ $data['clientName'] }}</p>
         <p>פרויקט: {{ $data['projectName'] }}</p>
-        <p>חברה: {{ $data['company'] }}</p>
+        <p>חברה: {{ $data['companyName'] }}</p>
         <p>עיר: {{ $data['city'] }}</p>
-        <p>נוצר על ידי: {{ $data['createdBy'] }}</p>
-        <p>אימייל: {{ $data['email'] }}</p>
+        <p>נוצר על ידי: {{ $data['documentProducer'] }}</p>
+        <p>אימייל: {{ $data['emailSent'] }}</p>
     </div>
 
     <div class="logo">
-        <img src="{{ public_path('path/to/your/logo.jpg') }}" alt="Logo" height="100">
+        <img src="{{ public_path('images/amedi-logo.jpg') }}" alt="Logo" class="logo">
     </div>
 
     <h2>מוצרים</h2>
@@ -59,13 +59,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($data['products'] as $product)
+            @foreach($data['billingData'] as $product)
                 <tr>
-                    <td>{{ $product['productName'] }}</td>
-                    <td>{{ $product['unitOfMeasure'] }}</td>
+                    <td>{{ $product['description'] }}</td>
+                    <td>{{ $product['unit'] }}</td>
                     <td>{{ $product['quantity'] }}</td>
                     <td>{{ $product['unitPrice'] }}</td>
-                    <td>{{ $product['unitPrice'] * $product['quantity'] }}</td>
+                    <td>{{ $product['total'] }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -90,20 +90,20 @@
                 $totalVat = 0;
                 $totalWithVat = 0;
             @endphp
-            @foreach($data['works'] as $work)
+            @foreach($data['billingData'] as $work)
                 @php
-                    $amountWithVat = $work['amount'] * 1.17;
-                    $totalBeforeVat += $work['amount'];
-                    $totalVat += $work['amount'] * 0.17;
+                    $amountWithVat = $work['total'] * 1.17;
+                    $totalBeforeVat += $work['total'];
+                    $totalVat += $work['total'] * 0.17;
                     $totalWithVat += $amountWithVat;
                 @endphp
                 <tr>
                     <td>{{ $work['month'] }}</td>
-                    <td>{{ $work['product'] }}</td>
-                    <td>{{ $work['installationPlace'] }}</td>
-                    <td>{{ $work['unitOfMeasure'] }}</td>
+                    <td>{{ $work['description'] }}</td>
+                    <td>{{ $work['location'] }}</td>
+                    <td>{{ $work['unit'] }}</td>
                     <td>{{ $work['quantity'] }}</td>
-                    <td>{{ number_format($work['amount'], 2) }}</td>
+                    <td>{{ number_format($work['total'], 2) }}</td>
                     <td>{{ number_format($amountWithVat, 2) }}</td>
                 </tr>
             @endforeach

@@ -168,6 +168,8 @@ class TasksController extends Controller
     {
 
         Log::info('update tasks controller index method called', ["id"=>$id]);
+    // Log the request data before validation
+    Log::info('Request data before validation', ['request' => $request->all()]);
 
         $validatedData = $request->validate([
             'subject' => 'nullable|string',

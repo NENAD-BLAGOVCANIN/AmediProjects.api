@@ -9,41 +9,75 @@ use App\Models\MonthlyCollection;
 use App\Models\SummaryDay;
 use App\Models\SummaryInstallation;
 use App\Models\SummaryPlanner;
+use App\Models\PriceOffers;
 use App\Models\Task; // Assuming Task is the model for user tasks
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use App\Models\Account;
 
 class PdfController extends Controller
 {
     public function generatePdf(Request $request)
     {
         $data = $request->all();
-
+    
         // Create an instance of MPDF
         $mpdf = new Mpdf([
-            'default_font' => 'dejavusans',  // Use a font that supports Hebrew
-            'mode' => 'utf-8', // Set the document encoding to UTF-8
+            'default_font' => 'dejavusans',
+            'mode' => 'utf-8',
             'format' => 'A4',
-            'directionality' => 'rtl'  // Set the direction to RTL
+            'directionality' => 'rtl'
         ]);
+
+        $accountController = new AccountController();
+        $accountController->store($request);
+
+//    // שליפת החשבון שנוצר
+//    $account = Account::with('accountDetails', 'project.manager')->latest()->first();
+
+//    // יצירת נתונים לתצוגה
+//    $pdfData = [
+//        'account' => $account,
+//        'project' => $account->project,
+//        // כל נתון נוסף שאתה צריך בתבנית
+//    ];
+        
 
         // Load HTML content with inline CSS for RTL support
         $html = view('pdf_template', compact('data'))->render();
-
+    
         // Write the HTML content to the PDF
         $mpdf->WriteHTML($html);
-
-        // Output the PDF for download
-        return response($mpdf->Output('document.pdf', 'I'), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="document.pdf"');
+    
+        // Save the PDF to a file
+        $pdfFilePath = storage_path('app/public/document.pdf');
+        $mpdf->Output($pdfFilePath, 'F');
+    
+        // Email addresses to send the PDF
+        $recipientEmails = ['eranlips@gmail.com', 'nitsanrozen01@gmail.com' , 'nirproject.office@gmail.com', 'niramidi@gmail.com'];
+        if (isset($data['email'])) {
+            $recipientEmails[] = $data['email'];
+        }
+    
+        // Send email with the PDF as an attachment
+        Mail::send([], [], function ($message) use ($pdfFilePath, $recipientEmails) {
+            $message->to($recipientEmails)
+                    ->subject('הצעת מחיר מאמדי פרוייקטים')
+                    ->attach($pdfFilePath);
+        });
+    
+        return response()->json(['message' => 'PDF generated and sent to email successfully.'],200);
     }
-
+    public function getWeeklyOffersCount()
+    {
+        $count = PriceOffers::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+        return response()->json(['weekly_offer_count' => $count]);
+    }
     public function generateAccountDetailsPdf(Request $request)
     {
         $data = $request->all();
-
+    
         // Create an instance of MPDF
         $mpdf = new Mpdf([
             'default_font' => 'dejavusans',  // Use a font that supports Hebrew
@@ -51,18 +85,34 @@ class PdfController extends Controller
             'format' => 'A4',
             'directionality' => 'rtl'  // Set the direction to RTL
         ]);
-
+    
         // Load HTML content with inline CSS for RTL support
         $html = view('account_details_pdf_template', compact('data'))->render();
-
+    
         // Write the HTML content to the PDF
         $mpdf->WriteHTML($html);
-
-        // Output the PDF for download
-        return response($mpdf->Output('account_details.pdf', 'I'), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="account_details.pdf"');
+    
+        // Save the PDF to a file
+        $pdfFilePath = storage_path('app/public/account_details.pdf');
+        $mpdf->Output($pdfFilePath, 'F');
+    
+        // Email addresses to send the PDF
+        $recipientEmails = ['eranlips@gmail.com', 'nitsanrozen01@gmail.com' , 'nirproject.office@gmail.com', 'niramidi@gmail.com'];
+        if (isset($data['emailSent'])) {
+            $recipientEmails[] = $data['emailSent'];
+        }
+    
+        // Send email with the PDF as an attachment
+        Mail::send([], [], function ($message) use ($pdfFilePath, $recipientEmails) {
+            $message->to($recipientEmails)
+                    ->subject('פירוט סיכום חשבון - ניר אמידי פרוייקטים בע"מ')
+                    ->attach($pdfFilePath);
+        });
+    
+        return response()->json(['message' => 'Account details PDF generated and sent to email successfully.'], 200);
     }
+    
+    
 
     public function generatePdfAndSendEmail(Request $request)
     {
@@ -287,5 +337,16 @@ public function generateDailyCollectionPdfAndSendEmail()
 
     return response()->json(['message' => 'Daily collection PDF generated and sent to email successfully.']);
 }
+
+public function generateAccountDetailsHtml(Request $request)
+{
+    $data = $request->all();
+
+    // Render the HTML content
+    $html = view('account_details_pdf_template', compact('data'))->render();
+
+    return response()->json(['html' => $html]);
+}
+
 
 }

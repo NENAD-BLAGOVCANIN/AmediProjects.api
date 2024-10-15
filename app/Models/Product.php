@@ -17,5 +17,9 @@ class Product extends Model
     {
         return $this->belongsTo(Project::class);
     }
+    public function production()
+    {
+        return $this->belongsTo(Production::class);
+    }
 
 }

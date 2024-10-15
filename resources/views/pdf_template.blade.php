@@ -70,18 +70,33 @@
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $totalWithoutVat = 0;
+                @endphp
                 @foreach($data['products'] as $product)
+                    @php
+                        $totalProductPrice = $product['price'] * $product['quantity'];
+                        $totalWithoutVat += $totalProductPrice;
+                    @endphp
                     <tr>
                         <td>{{ $product['description'] }}</td>
                         <td>{{ $product['price'] }}</td>
                         <td>{{ $product['unitOfMeasure'] }}</td>
                         <td>{{ $product['quantity'] }}</td>
-                        <td>{{ $product['price'] * $product['quantity'] }}</td> <!-- Total calculation -->
+                        <td>{{ $totalProductPrice }}</td> <!-- Total calculation -->
                         <td>{{ $product['remarks'] }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+
+        <!-- Display Total and VAT -->
+        @php
+            $vat = 0.17;
+            $totalWithVat = $totalWithoutVat * (1 + $vat);
+        @endphp
+        <h3>סה"כ לפני מע"מ: {{ $totalWithoutVat }}</h3>
+        <h3>סה"כ כולל מע"מ (17%): {{ $totalWithVat }}</h3>
 
         <!-- Important Notice Section -->
         <div class="important-notice">

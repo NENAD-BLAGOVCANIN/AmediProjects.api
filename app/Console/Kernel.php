@@ -26,6 +26,11 @@ class Kernel extends ConsoleKernel
             (new PdfController)->generateDailyPdfAndSendEmail(new \Illuminate\Http\Request());
         })->days([0, 1, 2, 3, 4]) // 0 = Sunday, 1 = Monday, ..., 4 = Thursday
         ->at('17:00');
+        $schedule->call(function () {
+            // You can use the controller method directly
+            (new PdfController)->generateWeeklyPdfAndSendEmail(new \Illuminate\Http\Request());
+        })->days([5]) // 0 = Sunday, 1 = Monday, ..., 4 = Thursday
+        ->at('17:00');
 
         $schedule->call(function () {
             // Call the method to move unfinished tasks and send email summary
