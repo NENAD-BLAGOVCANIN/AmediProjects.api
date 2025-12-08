@@ -5,6 +5,17 @@
 
     RewriteEngine On
 
+    # IP Access Control - Blacklist approach (allow all, deny specific IPs)
+    # To block specific IPs, add them below using Deny from directive
+    # Example: Deny from 192.168.1.100
+    # Example: Deny from 10.0.0.0/24
+    <RequireAll>
+        Require all granted
+        # Add IPs to block below:
+        # Require not ip 192.168.1.100
+        # Require not ip 10.0.0.50
+    </RequireAll>
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
